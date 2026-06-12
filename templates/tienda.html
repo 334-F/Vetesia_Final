@@ -48,8 +48,8 @@
 
             <div class="header-icons d-flex align-items-center">
                 <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Buscar...">
-                    <button class="search-btn" onclick="event.preventDefault(); this.previousElementSibling.focus();">
+                    <input type="text" id="navbarSearch" class="search-input" placeholder="Buscar..." onkeyup="filterProducts()">
+                    <button class="search-btn" onclick="event.preventDefault(); document.getElementById('navbarSearch').focus();">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                             class="bi bi-search nav-icon-search nav-svg-icon" viewBox="0 0 16 16">
                             <path
@@ -113,24 +113,11 @@
         <section id="productos" class="container mt-5 mb-5 pt-3">
             <h2 class="text-center mb-5" style="font-size: 3rem; color: #7ed957; font-family: 'Bebas Neue', sans-serif;">MAQUINARIA VETERINARIA</h2>
 
-            <!-- Buscador y Filtros -->
+            <!-- Filtros de Categoría y Precio -->
             <div class="filter-bar mb-5 p-4 rounded-4 shadow-sm" style="background-color: rgba(62, 179, 160, 0.05); border: 1px solid rgba(62, 179, 160, 0.15);">
-                <div class="row g-3">
-                    <!-- Búsqueda por nombre -->
-                    <div class="col-md-4">
-                        <label for="searchName" class="form-label fw-bold text-uppercase" style="font-size: 0.9rem; color: #3eb3a0; letter-spacing: 1px; font-family: 'Bebas Neue', sans-serif;">Buscar por nombre</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px; border-color: rgba(62, 179, 160, 0.25);">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#3eb3a0" class="bi bi-search" viewBox="0 0 16 16">
-                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                                </svg>
-                            </span>
-                            <input type="text" id="searchName" class="form-control border-start-0" placeholder="Escribe para buscar..." style="border-radius: 0 10px 10px 0; border-color: rgba(62, 179, 160, 0.25); outline: none; font-size: 1.1rem; font-family: 'Smooch Sans', sans-serif; font-weight: bold;" onkeyup="filterProducts()">
-                        </div>
-                    </div>
-
+                <div class="row g-3 justify-content-center">
                     <!-- Filtrar por categoría -->
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <label for="filterCategory" class="form-label fw-bold text-uppercase" style="font-size: 0.9rem; color: #3eb3a0; letter-spacing: 1px; font-family: 'Bebas Neue', sans-serif;">Categoría</label>
                         <select id="filterCategory" class="form-select" style="border-radius: 10px; border-color: rgba(62, 179, 160, 0.25); outline: none; font-size: 1.1rem; font-family: 'Smooch Sans', sans-serif; font-weight: bold; height: calc(2.25rem + 2px);" onchange="filterProducts()">
                             <option value="">Todas las categorías</option>
@@ -155,7 +142,7 @@
                         {% endfor %}
                         {% set max_price = prices|max|round(0, 'ceil')|int %}
                     {% endif %}
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <div class="d-flex justify-content-between">
                             <label for="filterPrice" class="form-label fw-bold text-uppercase" style="font-size: 0.9rem; color: #3eb3a0; letter-spacing: 1px; font-family: 'Bebas Neue', sans-serif;">Precio Máximo</label>
                             <span id="priceVal" class="fw-bold" style="color: #7ed957; font-size: 1.2rem; font-family: 'Smooch Sans', sans-serif;">{{ max_price }} €</span>
@@ -267,7 +254,8 @@
         }
 
         function filterProducts() {
-            const nameVal = document.getElementById('searchName').value.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const searchInput = document.getElementById('navbarSearch');
+            const nameVal = searchInput ? searchInput.value.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
             const catVal = document.getElementById('filterCategory').value;
             const priceVal = parseFloat(document.getElementById('filterPrice').value);
 
