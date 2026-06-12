@@ -39,8 +39,24 @@ def index():
 def tienda():
     conn = get_db_connection()
     productos = conn.execute('SELECT * FROM productos').fetchall()
+
+    favoritos = []
+
+    if 'user_id' in session:
+        favoritos_db = conn.execute(
+            'SELECT producto_id FROM favoritos WHERE usuario_id = ?',
+            (session['user_id'],)
+        ).fetchall()
+
+        favoritos = [f['producto_id'] for f in favoritos_db]
+
     conn.close()
-    return render_template('tienda.html', productos=productos)
+
+    return render_template(
+        'tienda.html',
+        productos=productos,
+        favoritos=favoritos
+    )
 
 @app.route('/servicios.html')
 def servicios():
@@ -570,6 +586,59 @@ def api_productos():
             'imagen_url': p['imagen_url']
         })
     return {"productos": productos}, 200
+
+@app.route('/favorito/<int:producto_id>', methods=['POST'])
+def favorito(producto_id):
+
+    if 'user_id' not in session:
+        flash('Debes iniciar sesión para guardar favoritos.', 'warning')
+        return redirect(url_for('cuenta'))
+
+    conn = get_db_connection()
+
+    existe = conn.execute(
+        'SELECT * FROM favoritos WHERE usuario_id=? AND producto_id=?',
+        (session['user_id'], producto_id)
+    ).fetchone()
+
+    if existe:
+        conn.execute(
+            'DELETE FROM favoritos WHERE usuario_id=? AND producto_id=?',
+            (session['user_id'], producto_id)
+        )
+    else:
+        conn.execute(
+            'INSERT INTO favoritos (usuario_id, producto_id) VALUES (?, ?)',
+            (session['user_id'], producto_id)
+        )
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('tienda'))
+
+@app.route('/favoritos.html')
+def favoritos():
+
+    if 'user_id' not in session:
+        flash('Debes iniciar sesión.', 'warning')
+        return redirect(url_for('cuenta'))
+
+    conn = get_db_connection()
+
+    productos = conn.execute('''
+        SELECT p.*
+        FROM productos p
+        JOIN favoritos f ON p.id = f.producto_id
+        WHERE f.usuario_id = ?
+    ''', (session['user_id'],)).fetchall()
+
+    conn.close()
+
+    return render_template(
+        'favoritos.html',
+        productos=productos
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

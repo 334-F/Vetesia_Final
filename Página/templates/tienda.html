@@ -9,28 +9,30 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/static/css/vetesia.css">
 
 </head>
 
 <body>
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="container mt-3">
-          {% for category, message in messages %}
-            <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          {% endfor %}
+    {% if messages %}
+    <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-      {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
-    
+
     <div class="container-1 d-flex justify-content-between align-items-center px-4">
         <a href="/"><img src="/static/fotos/logo.webp" alt="Logo Editor de Ropa" class="logo-1"></a>
-        
+
         <div class="d-flex align-items-center">
             <ul class="nav mb-0 me-4">
                 <li class="nav-item">
@@ -48,41 +50,56 @@
                 <div class="search-box">
                     <input type="text" class="search-input" placeholder="Buscar...">
                     <button class="search-btn" onclick="event.preventDefault(); this.previousElementSibling.focus();">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search nav-icon-search nav-svg-icon" viewBox="0 0 16 16">
-                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                            class="bi bi-search nav-icon-search nav-svg-icon" viewBox="0 0 16 16">
+                            <path
+                                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                         </svg>
                     </button>
                 </div>
                 <a href="/carrito.html" class="icon-link ms-3 position-relative" title="Carrito de Compras">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-cart3 nav-icon cart-icon-svg" viewBox="0 0 16 16">
-                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                        class="bi bi-cart3 nav-icon cart-icon-svg" viewBox="0 0 16 16">
+                        <path
+                            d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
                     </svg>
                     {% if cart_count > 0 %}
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size: 0.65rem;">
                         {{ cart_count }}
                     </span>
                     {% endif %}
                 </a>
-                <a href="/cuenta.html" class="icon-link ms-3 d-flex align-items-center text-decoration-none" title="{% if logged_in %}Sesión iniciada como {{ user_name }}{% else %}Mi Cuenta{% endif %}" style="color: inherit;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-circle nav-icon nav-svg-icon" viewBox="0 0 16 16">
-                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                <a href="/cuenta.html" class="icon-link ms-3 d-flex align-items-center text-decoration-none"
+                    title="{% if logged_in %}Sesión iniciada como {{ user_name }}{% else %}Mi Cuenta{% endif %}"
+                    style="color: inherit;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                        class="bi bi-person-circle nav-icon nav-svg-icon" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                        <path fill-rule="evenodd"
+                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" />
                     </svg>
                     {% if logged_in %}
-                    <span class="ms-1 d-none d-lg-inline" style="font-size: 0.95rem; color: #3eb3a0; font-weight: 500; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span class="ms-1 d-none d-lg-inline"
+                        style="font-size: 0.95rem; color: #3eb3a0; font-weight: 500; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         {{ user_name }}
                     </span>
                     {% if session.get('user_email') == 'admin@vetesia.com' %}
                     <a href="/admin.html" class="ms-2 text-success" title="Panel de Administración">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-shield-lock-fill" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M8 0c-.69 0-1.843.265-2.928.56-1.11.3-2.229.655-2.887.87a1.54 1.54 0 0 0-1.044 1.262c-.596 4.477.787 7.795 2.465 9.99a11.8 11.8 0 0 0 2.517 2.453c.386.273.744.482 1.048.625.28.132.581.24.829.24s.548-.108.829-.24c.3-.143.662-.352 1.048-.625a11.8 11.8 0 0 0 2.517-2.453c1.678-2.195 3.061-5.513 2.465-9.99a1.54 1.54 0 0 0-1.044-1.263 63 63 0 0 0-2.887-.87C9.843.266 8.69 0 8 0m0 5a1.5 1.5 0 0 1 .5 2.915l.385 1.99a.5.5 0 0 1-.97.185l-.15-.75-.15.75a.5.5 0 0 1-.97-.186l.385-1.99A1.5 1.5 0 0 1 8 5"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                            class="bi bi-shield-lock-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M8 0c-.69 0-1.843.265-2.928.56-1.11.3-2.229.655-2.887.87a1.54 1.54 0 0 0-1.044 1.262c-.596 4.477.787 7.795 2.465 9.99a11.8 11.8 0 0 0 2.517 2.453c.386.273.744.482 1.048.625.28.132.581.24.829.24s.548-.108.829-.24c.3-.143.662-.352 1.048-.625a11.8 11.8 0 0 0 2.517-2.453c1.678-2.195 3.061-5.513 2.465-9.99a1.54 1.54 0 0 0-1.044-1.263 63 63 0 0 0-2.887-.87C9.843.266 8.69 0 8 0m0 5a1.5 1.5 0 0 1 .5 2.915l.385 1.99a.5.5 0 0 1-.97.185l-.15-.75-.15.75a.5.5 0 0 1-.97-.186l.385-1.99A1.5 1.5 0 0 1 8 5" />
                         </svg>
                     </a>
                     {% endif %}
                     <a href="/logout" class="ms-2 text-danger" title="Cerrar Sesión">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
-                            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                            class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
+                            <path fill-rule="evenodd"
+                                d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
                         </svg>
                     </a>
                     {% endif %}
@@ -98,27 +115,46 @@
             <div class="row justify-content-center">
                 {% for producto in productos %}
                 <div class="col-md-4 col-sm-6 mb-4">
-                    <div class="card product-card text-center position-relative h-100 d-flex flex-column justify-content-between">
+                    <div
+                        class="card product-card text-center position-relative h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <button class="btn btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-3 heart-btn" onclick="this.classList.toggle('active'); event.preventDefault();">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-                                </svg>
-                            </button>
-                            <img src="/static/fotos/{{ producto.imagen_url }}" class="card-img-top product-img" alt="{{ producto.nombre }}">
-                            <div class="card-body pb-0">
-                                <h5 class="product-title">{{ producto.nombre }}</h5>
-                                <p class="card-text text-muted mb-1" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.4rem;">{{ producto.categoria }}</p>
-                                <h4 class="mb-3 fw-bold" style="color: #4a4a4a;">{{ "{:,.2f}".format(producto.precio).replace(",", "X").replace(".", ",").replace("X", ".") }} €</h4>
-                            </div>
+                            <form action="/favorito/{{ producto.id }}" method="POST">
+                                <button class="btn btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-3 heart-btn{% if producto.id in favoritos %} active{% endif %}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+                                        class="bi bi-heart-fill" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                            d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+                                    </svg>
+                                </button>
+                            </form>
+                                <img src="/static/fotos/{{ producto.imagen_url }}" class="card-img-top product-img"
+                                    alt="{{ producto.nombre }}">
+                                <div class="card-body pb-0">
+                                    <h5 class="product-title">{{ producto.nombre }}</h5>
+                                    <p class="card-text text-muted mb-1"
+                                        style="font-family: 'Smooch Sans', sans-serif; font-size: 1.4rem;">{{
+                                        producto.categoria }}</p>
+                                    <h4 class="mb-3 fw-bold" style="color: #4a4a4a;">{{
+                                        "{:,.2f}".format(producto.precio).replace(",", "X").replace(".",
+                                        ",").replace("X", ".") }} €</h4>
+                                </div>
                         </div>
                         <div class="card-body pt-0 pb-4">
                             <div class="d-flex justify-content-center gap-2 px-2">
-                                <a href="/{{ producto.slug }}.html" class="btn btn-outline-secondary w-50 m-0" style="border-radius: 10px; font-weight: 500; font-size: 1.1rem !important; padding: 6px 0; display: flex; align-items: center; justify-content: center;">Ver Más</a>
+                                <a href="/{{ producto.slug }}.html" class="btn btn-outline-secondary w-50 m-0"
+                                    style="border-radius: 10px; font-weight: 500; font-size: 1.1rem !important; padding: 6px 0; display: flex; align-items: center; justify-content: center;">Ver
+                                    Más</a>
                                 <form action="/cart/add" method="POST" class="w-50 m-0">
                                     <input type="hidden" name="product_id" value="{{ producto.id }}">
                                     <input type="hidden" name="cantidad" value="1">
-                                    <button type="submit" class="btn btn-1 text-white w-100 m-0 d-flex align-items-center justify-content-center gap-1" style="font-size: 1.1rem; padding: 6px 0; height: 100%;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg> Compra</button>
+                                    <button type="submit"
+                                        class="btn btn-1 text-white w-100 m-0 d-flex align-items-center justify-content-center gap-1"
+                                        style="font-size: 1.1rem; padding: 6px 0; height: 100%;"><svg
+                                            xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                            fill="currentColor" viewBox="0 0 16 16">
+                                            <path
+                                                d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                                        </svg> Compra</button>
                                 </form>
                             </div>
                         </div>
@@ -167,4 +203,5 @@
         </div>
     </footer>
 </body>
+
 </html>
