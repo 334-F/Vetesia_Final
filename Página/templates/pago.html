@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Datos de Pago</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/vetesia.css">
+</head>
+
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container mt-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
+    <div class="container-1 d-flex justify-content-between align-items-center px-4">
+        <a href="/"><img src="/static/fotos/logo.webp" alt="Logo Editor de Ropa" class="logo-1"></a>
+        
+        <div class="d-flex align-items-center">
+            <ul class="nav mb-0 me-4">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/tienda.html" class="nav-link">Tienda</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/servicios.html" class="nav-link">Servicios que ofrecemos</a>
+                </li>
+
+            </ul>
+
+            <div class="header-icons d-flex align-items-center">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Buscar...">
+                    <button class="search-btn" onclick="event.preventDefault(); this.previousElementSibling.focus();">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search nav-icon-search nav-svg-icon" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </button>
+                </div>
+                <a href="/carrito.html" class="icon-link ms-3 position-relative" title="Carrito de Compras">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-cart3 nav-icon cart-icon-svg" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                    </svg>
+                    {% if cart_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+                        {{ cart_count }}
+                    </span>
+                    {% endif %}
+                </a>
+                <a href="/cuenta.html" class="icon-link ms-3 d-flex align-items-center text-decoration-none" title="{% if logged_in %}Sesión iniciada como {{ user_name }}{% else %}Mi Cuenta{% endif %}" style="color: inherit;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-circle nav-icon nav-svg-icon" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                    </svg>
+                    {% if logged_in %}
+                    <span class="ms-1 d-none d-lg-inline" style="font-size: 0.95rem; color: #3eb3a0; font-weight: 500; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ user_name }}
+                    </span>
+                    {% if session.get('user_email') == 'admin@vetesia.com' %}
+                    <a href="/admin.html" class="ms-2 text-success" title="Panel de Administración">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-shield-lock-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 0c-.69 0-1.843.265-2.928.56-1.11.3-2.229.655-2.887.87a1.54 1.54 0 0 0-1.044 1.262c-.596 4.477.787 7.795 2.465 9.99a11.8 11.8 0 0 0 2.517 2.453c.386.273.744.482 1.048.625.28.132.581.24.829.24s.548-.108.829-.24c.3-.143.662-.352 1.048-.625a11.8 11.8 0 0 0 2.517-2.453c1.678-2.195 3.061-5.513 2.465-9.99a1.54 1.54 0 0 0-1.044-1.263 63 63 0 0 0-2.887-.87C9.843.266 8.69 0 8 0m0 5a1.5 1.5 0 0 1 .5 2.915l.385 1.99a.5.5 0 0 1-.97.185l-.15-.75-.15.75a.5.5 0 0 1-.97-.186l.385-1.99A1.5 1.5 0 0 1 8 5"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    <a href="/logout" class="ms-2 text-danger" title="Cerrar Sesión">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+    <form action="/submit_order" method="POST" class="was-validated">
+        <div class="container mt-5 mb-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="form-card">
+                        <h2 class="login-title" style="text-align: left; font-size: 2.5rem; margin-bottom: 20px;">Alta de Empresa (B2B)</h2>
+                        <hr>
+            <div class="mb-3 mt-3">
+                <label for="name" class="form-label">Nombre de la empresa:</label>
+                <input type="text" name="empresa" id="empresa" class="form-control" placeholder="Introduzca el nombre de la empresa"
+                    required value="{{ session.get('user_name', '') }}">
+                <div class="valid-feedback">Válido</div>
+                <div class="invalid-feedback">Por favor complete correctamente</div>
+            </div>
+            <div class="mb-3 mt-3">
+                <label for="contacto" class="form-label">Persona de contacto:</label>
+                <input type="text" name="contacto" id="contacto" class="form-control" placeholder="Nombre y apellidos del responsable"
+                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,50}" required>
+                <div class="valid-feedback">Válido</div>
+                <div class="invalid-feedback">Por favor complete correctamente</div>
+            </div>
+            <div class="mb-3 mt-3">
+                <label for="cif" class="form-label">CIF / NIF (Letra y 8 números):</label>
+                <input type="text" name="cif" id="cif" class="form-control" placeholder="Introduzca el CIF o NIF de la empresa"
+                    pattern="[a-zA-Z0-9]{9}" required>
+                <div class="valid-feedback">Válido</div>
+                <div class="invalid-feedback">Por favor complete correctamente</div>
+            </div>
+            <div class="mb-3 mt-3">
+                <label for="email" class="form-label">Correo electrónico:</label>
+                <input type="email" name="email" id="email" class="form-control"
+                    placeholder="introduzca su correo electrónico" required value="{{ session.get('user_email', '') }}" value="{{ session.get('user_email', '') }}"
+                    pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$">
+                <div class="valid-feedback">Válido</div>
+                <div class="invalid-feedback">Por favor complete correctamente</div>
+            </div>
+            <div class="mb-3 mt-3">
+                <label for="telef" class="form-label">Teléfono (9 números):</label>
+                <input type="tel" name="telef" id="telef" class="form-control"
+                    placeholder="introduzca su número de teléfono" required pattern="[0-9]{9}">
+                <div class="valid-feedback">Válido</div>
+                <div class="invalid-feedback">Por favor complete correctamente</div>
+            </div>
+        </div>
+
+        <div class="mt-5 pt-1">
+            <h2 class="login-title information" style="text-align: left; font-size: 2.5rem; margin-bottom: 20px;">Información adicional</h2>
+            <hr>
+            <div class="mt-4">
+                <label for="country" class="form-label">Zona:</label>
+                <select name="country" id="country" class="form-select custom-fino" required>
+                    <option value="" selected disabled>Elija zona</button>
+                    <option value="PI">Península Ibérica</option>
+                    <option value="IB">Islas Baleares</option>
+                    <option value="IC">Islas canarias</option>
+                </select>
+            </div>
+            <div class="mt-3">
+                <label for="text" class="form-label">Municipio:</label>
+                <input type="text" name="ct" id="ct" class="form-control" placeholder="Introduzca su municipio" required
+                    pattern="[a-zA-Z]{0-50}">
+                <div class="valid-feedback">Válido</div>
+                <div class="invalid-feedback">Por favor complete correctamente</div>
+            </div>
+            <div class=" mt-3">
+                <label for="direccion" class="form-label">Dirección:</label>
+                <input type="text" name="direccion" id="direccion" class="form-control" placeholder="Introduzca su dirección de entrega"
+                    required>
+                <div class="valid-feedback">Válido</div>
+                <div class="invalid-feedback">Por favor complete correctamente</div>
+            </div>
+            <div class=" mt-3 ">
+                <label for="codigo_postal" class="form-label">Código postal (5 números):</label>
+                <input type="text" name="codigo_postal" id="codigo_postal" class="form-control" placeholder="Introduzca su código postal"
+                    required pattern="[0-9]{5}">
+                <div class="valid-feedback">Válido</div>
+                <div class="invalid-feedback">Por favor complete correctamente</div>
+            </div>
+        </div>
+        <div class="mt-5">
+            <h2 class="login-title" style="text-align: left; font-size: 2.5rem; margin-bottom: 20px;">Datos de pago</h2>
+            <hr>
+            <div class="alert alert-info" role="alert">
+                <strong>Transferencia Bancaria (B2B):</strong> Por favor, introduzca el IBAN desde el cual su empresa realizará las transferencias. Le emitiremos los cobros a esta cuenta.
+            </div>
+            <div class="input-group mb-3 mt-3">
+                <span class="input-group-text">Titular de la cuenta</span>
+                <input type="text" class="form-control" name="titular_cuenta" required placeholder="Nombre de la empresa titular">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">IBAN</span>
+                <input type="text" class="form-control" name="iban" required pattern="[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}"
+                    placeholder="ESXX XXXX XXXX XXXX XXXX XXXX" title="Introduzca un IBAN válido (ej. ES12...)">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Entidad Bancaria</span>
+                <input type="text" class="form-control" name="banco" required placeholder="Nombre del banco">
+            </div>
+            <button class="btn btn-custom w-100 fs-4 mt-4" type="submit">Enviar Solicitud</button>
+        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <footer class="gradient-footer text-white text-center ">
+        <div class="container">
+            <img src="/static/fotos/logo.webp" alt="Logo Editor de Ropa" class="logo mb-2">
+
+            <div class="social-icons">
+                <a href="https://www.instagram.com/nazth09?igsh=MWoxYXZ6N2pyczA1Ng%3D%3D&utm_source=qr" target="_blank"
+                    class="text-white mx-2">
+                </a>
+                <a href="https://x.com/nathansmf?s=11&t=5QyMTIlgbGhRkPTGuh2HUg" target="_blank" class="text-white mx-2">
+                </a>
+                <a href="https://wa.me/691019799" class="text-white mx-2">
+                </a>
+            </div>
+            <div class="contact-info mt-3" style="color: black;">
+                <p class="mb-1" style="color: black;"><strong>Dirección:</strong> Calle de Don Ramón de la Cruz 41,
+                    Madrid, España</p>
+                <p class="mb-1" style="color: black;"><strong>Correo:</strong> <a href="mailto:info@vetésia.com"
+                        style="color: black; text-decoration: none;">info@vetesia.com</a></p>
+            </div>
+
+            <p class="mt-3 mb-0" style="color: black;">&copy; 2025 VetÉsia - Todos los derechos reservados</p>
+
+            <div class="social-icons">
+                <a href="https://www.instagram.com/nazth09?igsh=MWoxYXZ6N2pyczA1Ng%3D%3D&utm_source=qr" target="_blank"
+                    class="mx-2">
+                    <img src="/static/fotos/Instagram.png" alt="Instagram" class="social-logo">
+                </a>
+                <a href="https://x.com/nathansmf?s=11&t=5QyMTIlgbGhRkPTGuh2HUg" target="_blank" class="mx-2">
+                    <img src="/static/fotos/pixelcut-export.png" alt="Twitter" class="social-logo">
+                </a>
+                <a href="https://wa.me/691019799" target="_blank" class="whatsapp">
+                    <img src="/static/fotos/Whatsapp.png" alt="WhatsApp" class="social-logo">
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+
+
+</html>
