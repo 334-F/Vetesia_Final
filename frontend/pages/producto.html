@@ -12,18 +12,15 @@
   <link rel="stylesheet" href="/css/vetesia.css">
 </head>
 <body>
-  <!-- HEADER / NAVBAR -->
-  <div id="navbar-holder"></div>
+    <div id="navbar-holder"></div>
 
   <div class="container mt-5 mb-5" style="min-height: 60vh;" id="producto-container">
     <div class="text-center py-5"><div class="spinner-vetesia"></div></div>
   </div>
 
-  <!-- FOOTER -->
-  <div id="footer-holder"></div>
+    <div id="footer-holder"></div>
 
-  <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/js/config.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/auth.js"></script>
@@ -111,15 +108,13 @@
         </nav>
 
         <div class="row">
-          <!-- Left Column: Image -->
-          <div class="col-md-6 mb-4">
+                    <div class="col-md-6 mb-4">
             <div class="p-4 bg-white d-flex align-items-center justify-content-center" style="box-shadow: 0 10px 40px rgba(0,0,0,0.08); border-radius: 20px; min-height: 500px;">
               <img src="${imgUrl}" onerror="this.src='/img/placeholder.png'" class="img-fluid" style="max-height: 450px; object-fit: contain;" alt="${VETESIA.ui.escapeHtml(producto.nombre)}">
             </div>
           </div>
 
-          <!-- Right Column: Info -->
-          <div class="col-md-6 ps-md-5">
+                    <div class="col-md-6 ps-md-5">
             <span class="badge bg-success mb-2" style="border-radius: 8px; padding: 6px 12px; font-weight: 500; font-size: 0.85rem;">
               ${producto.tipo === 'personalizable' ? 'Uniforme Personalizable' : 'Material Clínico'}
             </span>
@@ -145,8 +140,7 @@
 
             ${escaladosHtml}
 
-            <!-- Add to Cart Form -->
-            <form id="form-anadir" class="p-4 mt-4" style="background: rgba(62, 179, 160, 0.05); border-radius: 15px; border: 1px solid rgba(62, 179, 160, 0.2);">
+                        <form id="form-anadir" class="p-4 mt-4" style="background: rgba(62, 179, 160, 0.05); border-radius: 15px; border: 1px solid rgba(62, 179, 160, 0.2);">
               ${personalizable ? `
                 <h5 class="fw-bold mb-3" style="color:#3eb3a0;">Personalización de Uniforme</h5>
                 <div class="mb-3">
@@ -187,8 +181,7 @@
 
         ${specsHtml}
 
-        <!-- Reseñas -->
-        <div class="row mt-5 pt-4">
+                <div class="row mt-5 pt-4">
           <div class="col-lg-8">
             <h3 class="fw-bold mb-4" style="color: #3eb3a0;"><i class="bi bi-chat-square-text me-2"></i>Valoraciones de Profesionales</h3>
             <div id="resenas-lista">
