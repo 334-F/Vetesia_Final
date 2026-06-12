@@ -257,34 +257,37 @@ def init_db():
         ''', prov)
 
     # Insertar pedidos de prueba (Ventas)
-    cursor.execute('SELECT count(*) FROM pedidos').fetchone()
-    cursor.execute('''
-        INSERT INTO pedidos (id, usuario_id, empresa, email, cif, contacto, telefono, zona, municipio, direccion, codigo_postal, titular_cuenta, iban, banco, subtotal, iva, total, estado, fecha)
-        VALUES (1, 2, 'Clínica Veterinaria María', 'maria@example.com', 'B12345678', 'María García', '600000002', 'Península', 'Madrid', 'Calle Mayor 1', '28001', 'María García', 'ES12345678901234567890', 'Banco de Prueba', 3090.00, 648.90, 3738.90, 'entregado', '2026-06-01 10:00:00')
-    ''')
-    cursor.execute('INSERT OR IGNORE INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (1, 1, 1, 2850.00)')
-    cursor.execute('INSERT OR IGNORE INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (1, 3, 2, 120.00)')
+    cursor.execute('SELECT count(*) FROM pedidos')
+    if cursor.fetchone()[0] == 0:
+        cursor.execute('''
+            INSERT INTO pedidos (id, usuario_id, empresa, email, cif, contacto, telefono, zona, municipio, direccion, codigo_postal, titular_cuenta, iban, banco, subtotal, iva, total, estado, fecha)
+            VALUES (1, 2, 'Clínica Veterinaria María', 'maria@example.com', 'B12345678', 'María García', '600000002', 'Península', 'Madrid', 'Calle Mayor 1', '28001', 'María García', 'ES12345678901234567890', 'Banco de Prueba', 3090.00, 648.90, 3738.90, 'entregado', '2026-06-01 10:00:00')
+        ''')
+        cursor.execute('INSERT OR IGNORE INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (1, 1, 1, 2850.00)')
+        cursor.execute('INSERT OR IGNORE INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (1, 3, 2, 120.00)')
 
-    cursor.execute('''
-        INSERT INTO pedidos (id, usuario_id, empresa, email, cif, contacto, telefono, zona, municipio, direccion, codigo_postal, titular_cuenta, iban, banco, subtotal, iva, total, estado, fecha)
-        VALUES (2, 3, 'Clínica Carlos Ruiz', 'carlos@clinica.com', 'A87654321', 'Carlos Ruiz', '600000003', 'Península', 'Valencia', 'Av. Veterinaria 22', '46001', 'Carlos Ruiz', 'ES09876543210987654321', 'Banco de Prueba', 1670.00, 350.70, 2020.70, 'pagado', '2026-06-05 14:30:00')
-    ''')
-    cursor.execute('INSERT OR IGNORE INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (2, 2, 1, 1550.00)')
-    cursor.execute('INSERT OR IGNORE INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (2, 3, 1, 120.00)')
+        cursor.execute('''
+            INSERT INTO pedidos (id, usuario_id, empresa, email, cif, contacto, telefono, zona, municipio, direccion, codigo_postal, titular_cuenta, iban, banco, subtotal, iva, total, estado, fecha)
+            VALUES (2, 3, 'Clínica Carlos Ruiz', 'carlos@clinica.com', 'A87654321', 'Carlos Ruiz', '600000003', 'Península', 'Valencia', 'Av. Veterinaria 22', '46001', 'Carlos Ruiz', 'ES09876543210987654321', 'Banco de Prueba', 1670.00, 350.70, 2020.70, 'pagado', '2026-06-05 14:30:00')
+        ''')
+        cursor.execute('INSERT OR IGNORE INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (2, 2, 1, 1550.00)')
+        cursor.execute('INSERT OR IGNORE INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (2, 3, 1, 120.00)')
 
     # Insertar compras de prueba (Gastos de Proveedores)
-    cursor.execute('''
-        INSERT INTO compras (proveedor_id, concepto, monto, fecha)
-        VALUES (1, 'Compra de 3 Estaciones de Anestesia Veta 5 Plus', 4500.00, '2026-05-15 09:00:00')
-    ''')
-    cursor.execute('''
-        INSERT INTO compras (proveedor_id, concepto, monto, fecha)
-        VALUES (1, 'Adquisición de Consumibles y Circuitos', 1200.00, '2026-05-20 11:30:00')
-    ''')
-    cursor.execute('''
-        INSERT INTO compras (proveedor_id, concepto, monto, fecha)
-        VALUES (2, 'Uniformes personalizados para equipo técnico', 350.00, '2026-05-25 15:45:00')
-    ''')
+    cursor.execute('SELECT count(*) FROM compras')
+    if cursor.fetchone()[0] == 0:
+        cursor.execute('''
+            INSERT INTO compras (proveedor_id, concepto, monto, fecha)
+            VALUES (1, 'Compra de 3 Estaciones de Anestesia Veta 5 Plus', 4500.00, '2026-05-15 09:00:00')
+        ''')
+        cursor.execute('''
+            INSERT INTO compras (proveedor_id, concepto, monto, fecha)
+            VALUES (1, 'Adquisición de Consumibles y Circuitos', 1200.00, '2026-05-20 11:30:00')
+        ''')
+        cursor.execute('''
+            INSERT INTO compras (proveedor_id, concepto, monto, fecha)
+            VALUES (2, 'Uniformes personalizados para equipo técnico', 350.00, '2026-05-25 15:45:00')
+        ''')
 
     # Insertar algunas reseñas de prueba
     cursor.execute('''
