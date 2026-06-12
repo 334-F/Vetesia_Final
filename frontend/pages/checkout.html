@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finalizar Compra · VetÉsia</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vetesia.css">
+  <link rel="stylesheet" href="/css/carrito.css">
+</head>
+<body>
+  <!-- HEADER / NAVBAR -->
+  <div id="navbar-holder"></div>
+
+  <!-- CHECKOUT SECTION -->
+  <div class="container my-5" style="min-height: 70vh;">
+    <h2 class="cart-title mb-4">Finalizar Compra B2B</h2>
+    <div id="checkout-contenido">
+      <div class="text-center py-5"><div class="spinner-vetesia"></div></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer-holder"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    let direcciones = [];
+    let metodosPago = [];
+    let zonasEnvio = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!VETESIA.auth.requireAuth()) return;
+
+      const carrito = VETESIA.cart.obtener();
+      if (carrito.length === 0) {
+        document.getElementById('checkout-contenido').innerHTML = `
+          <div class="alert alert-warning text-center py-4 fs-5" style="border-radius:15px;">
+            El carrito está vacío. <a href="/pages/catalogo.html" style="color:#3eb3a0; font-weight:bold;">Ir al catálogo</a>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        [direcciones, metodosPago, zonasEnvio] = await Promise.all([
+          VETESIA.api.get('/direcciones'),
+          VETESIA.api.get('/pedidos/metodos-pago'),
+          VETESIA.api.get('/pedidos/zonas-envio'),
+        ]);
+        render(carrito);
+      } catch (e) {
+        document.getElementById('checkout-contenido').innerHTML =
+          `<div class="alert alert-danger text-center py-4">${e.message}</div>`;
+      }
+    });
+
+    function render(carrito) {
+      const cont = document.getElementById('checkout-contenido');
+      
+      cont.innerHTML = `
+        <div class="row">
+          <div class="col-lg-8">
+            <!-- 1. Dirección de envío -->
+            <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius:15px; border-top: 4px solid #3eb3a0;">
+              <h4 class="fw-bold mb-3" style="color: #4a4a4a;"><i class="bi bi-geo-alt me-2" style="color:#3eb3a0;"></i>1. Dirección de Entrega</h4>
+              ${direcciones.length === 0 ? `
+                <div class="alert alert-warning py-3" style="border-radius:10px;">
+                  No tienes ninguna dirección B2B guardada en tu panel.
+                  <br>
+                  <a href="/pages/mis-direcciones.html?next=/pages/checkout.html" class="btn btn-custom btn-sm mt-3">Añadir una dirección ahora</a>
+                </div>
+              ` : `
+                <div id="direcciones-lista" class="mb-3">
+                  ${direcciones.map(d => `
+                    <div class="form-check mb-2 p-3 border rounded" style="border-radius: 10px !important;">
+                      <input class="form-check-input ms-1 me-2" type="radio" name="direccion"
+                             id="dir-${d.id}" value="${d.id}" ${d.predeterminada ? 'checked' : ''}>
+                      <label class="form-check-label ps-2" for="dir-${d.id}">
+                        <strong style="color:#3eb3a0; font-size:1.1rem;">${VETESIA.ui.escapeHtml(d.alias)}</strong> — Destinatario: ${VETESIA.ui.escapeHtml(d.destinatario)}
+                        <br><span class="small text-muted">${VETESIA.ui.escapeHtml(d.calle)} ${d.numero || ''} ${d.piso || ''}, ${d.codigo_postal} ${d.municipio} (${d.provincia})</span>
+                      </label>
+                    </div>
+                  `).join('')}
+                </div>
+                <a href="/pages/mis-direcciones.html?next=/pages/checkout.html" style="color:#7ed957; font-weight:bold; text-decoration:none;"><i class="bi bi-plus-circle me-1"></i>Añadir nueva dirección B2B</a>
+              `}
+            </div>
+
+            <!-- 2. Zona de envío -->
+            <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius:15px; border-top: 4px solid #3eb3a0;">
+              <h4 class="fw-bold mb-3" style="color: #4a4a4a;"><i class="bi bi-truck me-2" style="color:#3eb3a0;"></i>2. Zona de Reparto y Envío</h4>
+              <select id="zona-envio" class="form-select form-select-lg" style="border-radius:10px;">
+                ${zonasEnvio.map(z => `
+                  <option value="${z.id}" data-coste="${z.coste_envio}">
+                    ${VETESIA.ui.escapeHtml(z.nombre)} — Coste de Envío: ${VETESIA.ui.precio(z.coste_envio)} (Plazo: ${z.plazo_dias} días hábiles)
+                  </option>
+                `).join('')}
+              </select>
+            </div>
+
+            <!-- 3. Método de pago -->
+            <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius:15px; border-top: 4px solid #3eb3a0;">
+              <h4 class="fw-bold mb-3" style="color: #4a4a4a;"><i class="bi bi-credit-card me-2" style="color:#3eb3a0;"></i>3. Método de Facturación y Pago</h4>
+              <div class="mb-3">
+                ${metodosPago.map(m => `
+                  <div class="form-check mb-2 p-3 border rounded" style="border-radius: 10px !important;">
+                    <input class="form-check-input ms-1 me-2" type="radio" name="metodo-pago"
+                           id="pago-${m.id}" value="${m.id}" data-pasarela="${m.requiere_pasarela}">
+                    <label class="form-check-label ps-2" for="pago-${m.id}">
+                      <strong style="color:#3eb3a0; font-size:1.1rem;">${VETESIA.ui.escapeHtml(m.nombre)}</strong>
+                      ${m.descripcion ? '<br><span class="small text-muted">' + VETESIA.ui.escapeHtml(m.descripcion) + '</span>' : ''}
+                    </label>
+                  </div>
+                `).join('')}
+              </div>
+              <div id="info-tarjeta" class="alert alert-info mt-2" style="display:none; border-radius:10px;">
+                💳 <strong>Pasarela de Pago Stripe:</strong> Para esta demo académica, usa la tarjeta de prueba: <code>4242 4242 4242 4242</code>, cualquier fecha futura y cualquier CVC.
+              </div>
+            </div>
+
+            <!-- 4. Notas -->
+            <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius:15px; border-top: 4px solid #3eb3a0;">
+              <h4 class="fw-bold mb-3" style="color: #4a4a4a;"><i class="bi bi-chat-text me-2" style="color:#3eb3a0;"></i>4. Notas del Pedido (opcional)</h4>
+              <textarea id="notas" class="form-control" rows="2" placeholder="Indicaciones para el transportista, horario de entrega, etc..." style="border-radius:10px;"></textarea>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <!-- Summary -->
+            <div class="checkout-summary bg-light p-4" style="border-radius:15px; border-top: 4px solid #7ed957;">
+              <h4 class="mb-4 fw-bold" style="color: #3eb3a0; font-family: 'Bebas Neue', sans-serif;">Resumen de Compra</h4>
+              ${carrito.map(l => {
+                const precio = l.precio_base + (l.precio_extra_servicio || 0);
+                return `
+                  <div class="d-flex justify-content-between mb-2" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.35rem;">
+                    <span>${VETESIA.ui.escapeHtml(l.nombre)} × ${l.cantidad}</span>
+                    <span>${VETESIA.ui.precio(precio * l.cantidad)}</span>
+                  </div>
+                `;
+              }).join('')}
+              <hr>
+              <div class="d-flex justify-content-between mb-2 fs-5" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.35rem;">
+                <span>Subtotal (sin IVA):</span>
+                <span id="subtotal">${VETESIA.ui.precio(VETESIA.cart.calcularSubtotal())}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2 fs-5" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.35rem;">
+                <span>Gastos de Envío:</span>
+                <span id="envio">${VETESIA.ui.precio(zonasEnvio[0] ? zonasEnvio[0].coste_envio : 0)}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2 fs-5 text-muted" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.35rem;">
+                <span>IVA (21%):</span>
+                <span id="iva-calc">${VETESIA.ui.precio(VETESIA.cart.calcularSubtotal() * 0.21)}</span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between total mb-4 mt-3">
+                <span class="fs-3 fw-bold">Total con IVA:</span>
+                <span id="total" style="color: #7ed957;" class="fs-3 fw-bold">${VETESIA.ui.precio(VETESIA.cart.calcularSubtotal() + parseFloat(zonasEnvio[0] ? zonasEnvio[0].coste_envio : 0) + (VETESIA.cart.calcularSubtotal() * 0.21))}</span>
+              </div>
+              <button id="btn-confirmar" class="btn btn-custom w-100 py-3 fs-5" style="border-radius: 30px;">
+                ✓ Confirmar Pedido
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Event listener para actualizar el coste del envío al cambiar zona
+      document.getElementById('zona-envio').addEventListener('change', actualizarTotal);
+      
+      // Mostrar info tarjeta si se selecciona Stripe
+      document.querySelectorAll('input[name="metodo-pago"]').forEach(r => {
+        r.addEventListener('change', e => {
+          document.getElementById('info-tarjeta').style.display =
+            e.target.dataset.pasarela === 'true' ? 'block' : 'none';
+        });
+      });
+      
+      document.getElementById('btn-confirmar').addEventListener('click', confirmarPedido);
+      actualizarTotal();
+    }
+
+    function actualizarTotal() {
+      const sel = document.getElementById('zona-envio');
+      if (!sel) return;
+      const coste = parseFloat(sel.options[sel.selectedIndex].dataset.coste) || 0;
+      const subtotal = VETESIA.cart.calcularSubtotal();
+      const iva = (subtotal + coste) * 0.21;
+      
+      document.getElementById('envio').textContent = VETESIA.ui.precio(coste);
+      document.getElementById('iva-calc').textContent = VETESIA.ui.precio(iva);
+      document.getElementById('total').textContent = VETESIA.ui.precio(subtotal + coste + iva);
+    }
+
+    async function confirmarPedido() {
+      const direccionEl = document.querySelector('input[name="direccion"]:checked');
+      const metodoEl = document.querySelector('input[name="metodo-pago"]:checked');
+      const zona = document.getElementById('zona-envio').value;
+
+      if (!direccionEl) {
+        VETESIA.ui.toast('Selecciona una dirección de entrega', 'error');
+        return;
+      }
+      if (!metodoEl) {
+        VETESIA.ui.toast('Selecciona un método de pago', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-confirmar');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Procesando pedido B2B…';
+
+      try {
+        const carrito = VETESIA.cart.obtener();
+        const lineas = carrito.map(l => ({
+          producto_id: l.producto_id,
+          cantidad: l.cantidad,
+          tipo_servicio_id: l.tipo_servicio_id || null,
+          personalizacion: l.personalizacion || null,
+        }));
+
+        const resp = await VETESIA.api.post('/pedidos', {
+          direccion_envio_id: parseInt(direccionEl.value, 10),
+          metodo_pago_id: parseInt(metodoEl.value, 10),
+          zona_envio_id: parseInt(zona, 10),
+          notas: document.getElementById('notas').value || null,
+          lineas,
+        });
+
+        VETESIA.cart.vaciar();
+        VETESIA.ui.toast('¡Pedido registrado correctamente!', 'success');
+        setTimeout(() => {
+          window.location.href = `/pages/pedido-confirmado.html?id=${resp.pedido.id}`;
+        }, 1000);
+      } catch (e) {
+        VETESIA.ui.toast(e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '✓ Confirmar Pedido';
+      }
+    }
+  </script>
+</body>
+</html>

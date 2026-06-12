@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de Producto · VetÉsia</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vetesia.css">
+</head>
+<body>
+  <!-- HEADER / NAVBAR -->
+  <div id="navbar-holder"></div>
+
+  <div class="container mt-5 mb-5" style="min-height: 60vh;" id="producto-container">
+    <div class="text-center py-5"><div class="spinner-vetesia"></div></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer-holder"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    const productoId = VETESIA.ui.queryParam('id');
+    let producto = null;
+    let tiposServicio = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!productoId) {
+        window.location.href = '/pages/catalogo.html';
+        return;
+      }
+
+      try {
+        producto = await VETESIA.api.get(`/productos/${productoId}`);
+
+        if (producto.tipo === 'personalizable') {
+          tiposServicio = await VETESIA.api.get('/pedidos/tipos-servicio');
+        }
+
+        renderProducto();
+      } catch (e) {
+        document.getElementById('producto-container').innerHTML =
+          `<div class="alert alert-danger text-center py-5 fs-4" style="border-radius:15px;">${e.message}</div>`;
+      }
+    });
+
+    function renderProducto() {
+      const personalizable = producto.tipo === 'personalizable';
+      const imgUrl = VETESIA.ui.imagen(producto.imagen_url);
+      
+      // Parsear especificaciones técnicas si existen
+      let specsHtml = '';
+      if (producto.especificaciones_json) {
+        try {
+          const specs = JSON.parse(producto.especificaciones_json);
+          specsHtml = `
+            <div class="mt-5 pt-4 mb-5">
+              <h3 style="color: #3eb3a0; border-bottom: 2px solid #7ed957; display: inline-block; padding-bottom: 8px; margin-bottom: 25px;">Especificaciones Técnicas</h3>
+              <div class="table-responsive" style="border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                <table class="table table-striped table-hover mb-0 table-brand">
+                  <tbody>
+                    ${Object.entries(specs).map(([key, val]) => `
+                      <tr>
+                        <th scope="row" style="width: 30%; background: #f8f9fa;" class="py-3 px-4 fw-bold">${VETESIA.ui.escapeHtml(key)}</th>
+                        <td class="py-3 px-4 text-muted">${VETESIA.ui.escapeHtml(val)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        } catch (e) {
+          console.error('Error parsing specifications JSON', e);
+        }
+      }
+
+      // Descuento por volumen
+      let escaladosHtml = '';
+      if (producto.precios_escalados && producto.precios_escalados.length > 0) {
+        escaladosHtml = `
+          <div class="alert alert-info py-3 mb-4" style="border-radius: 12px; border-left: 5px solid #3eb3a0;">
+            <strong class="d-block mb-1"><i class="bi bi-tag-fill me-1"></i> Descuento por volumen B2B:</strong>
+            <ul class="mb-0 ps-3 small">
+              ${producto.precios_escalados.map(pe => `
+                <li>${pe.cantidad_min}${pe.cantidad_max ? '-' + pe.cantidad_max : '+'} unidades: <span class="fw-bold">${VETESIA.ui.precio(pe.precio_unitario)}</span> / ud</li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+      }
+
+      const html = `
+        <nav aria-label="breadcrumb" class="mb-4">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/index.html" style="color: #3eb3a0; text-decoration: none;">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="/pages/catalogo.html" style="color: #3eb3a0; text-decoration: none;">Tienda</a></li>
+            <li class="breadcrumb-item active" aria-current="page">${VETESIA.ui.escapeHtml(producto.nombre)}</li>
+          </ol>
+        </nav>
+
+        <div class="row">
+          <!-- Left Column: Image -->
+          <div class="col-md-6 mb-4">
+            <div class="p-4 bg-white d-flex align-items-center justify-content-center" style="box-shadow: 0 10px 40px rgba(0,0,0,0.08); border-radius: 20px; min-height: 500px;">
+              <img src="${imgUrl}" onerror="this.src='/img/placeholder.png'" class="img-fluid" style="max-height: 450px; object-fit: contain;" alt="${VETESIA.ui.escapeHtml(producto.nombre)}">
+            </div>
+          </div>
+
+          <!-- Right Column: Info -->
+          <div class="col-md-6 ps-md-5">
+            <span class="badge bg-success mb-2" style="border-radius: 8px; padding: 6px 12px; font-weight: 500; font-size: 0.85rem;">
+              ${producto.tipo === 'personalizable' ? 'Uniforme Personalizable' : 'Material Clínico'}
+            </span>
+            <h1 style="font-size: 3rem; color: #4a4a4a; font-weight: 700;" class="mb-2">${VETESIA.ui.escapeHtml(producto.nombre)}</h1>
+            <h3 class="mb-3" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.8rem; color: #666;">${VETESIA.ui.escapeHtml(producto.categoria_nombre || '')}</h3>
+            
+            <div class="mb-3 d-flex align-items-center gap-2">
+              ${VETESIA.ui.estrellas(producto.valoracion_media)}
+              <span class="text-muted small">(${producto.num_resenas} valoraciones)</span>
+            </div>
+
+            <h2 style="color: #3eb3a0; font-family: 'Bebas Neue', cursive; font-size: 3.5rem; letter-spacing: 1px;" class="mt-4 mb-3">
+              ${VETESIA.ui.precio(producto.precio_base)} <span style="font-size: 1.2rem; color: #999; font-family: 'Poppins', sans-serif; font-weight: normal; letter-spacing: 0;">+ IVA</span>
+            </h2>
+
+            <div class="mb-4">
+              ${VETESIA.ui.stockInfo(producto.stock)}
+            </div>
+
+            <p style="font-size: 1.15rem; color: #555; line-height: 1.6;">
+              ${VETESIA.ui.escapeHtml(producto.descripcion || '')}
+            </p>
+
+            ${escaladosHtml}
+
+            <!-- Add to Cart Form -->
+            <form id="form-anadir" class="p-4 mt-4" style="background: rgba(62, 179, 160, 0.05); border-radius: 15px; border: 1px solid rgba(62, 179, 160, 0.2);">
+              ${personalizable ? `
+                <h5 class="fw-bold mb-3" style="color:#3eb3a0;">Personalización de Uniforme</h5>
+                <div class="mb-3">
+                  <label class="form-label small text-muted mb-1">Tipo de Servicio:</label>
+                  <select id="tipo-servicio" class="form-select" style="border-radius:10px;" required>
+                    ${tiposServicio.map(t => `
+                      <option value="${t.id}" data-extra="${t.precio_extra}" data-nombre="${t.nombre}">
+                        ${VETESIA.ui.escapeHtml(t.nombre)} (+${VETESIA.ui.precio(t.precio_extra)})
+                      </option>
+                    `).join('')}
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label small text-muted mb-1">Nombre o Texto a Bordar / Estampar:</label>
+                  <input type="text" id="personalizacion" class="form-control" placeholder="Ej: Clínica Vet Pío Baroja" style="border-radius:10px;">
+                </div>
+              ` : ''}
+
+              <div class="d-flex align-items-center">
+                <div class="me-3" style="width: 100px;">
+                  <label for="cantidad" class="form-label small text-muted mb-1">Cantidad:</label>
+                  <input type="number" id="cantidad" class="form-control form-control-lg" value="1" min="1" max="${producto.stock}" style="text-align: center; border-radius: 10px;">
+                </div>
+                <div class="flex-grow-1 align-self-end">
+                  <button type="submit" class="btn btn-custom w-100 btn-lg shadow-sm" style="border-radius: 10px; font-weight: 500;" ${producto.stock <= 0 ? 'disabled' : ''}>
+                    <i class="bi bi-cart-plus me-2"></i> Añadir al Carrito
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div class="mt-4 pt-4 border-top">
+              <p class="text-muted small mb-1"><i class="bi bi-shield-check me-2" style="color: #3eb3a0;"></i> Garantía oficial de 2 años incluida.</p>
+              <p class="text-muted small mb-0"><i class="bi bi-truck me-2" style="color: #3eb3a0;"></i> Envío especializado asegurado en 24-72h.</p>
+            </div>
+          </div>
+        </div>
+
+        ${specsHtml}
+
+        <!-- Reseñas -->
+        <div class="row mt-5 pt-4">
+          <div class="col-lg-8">
+            <h3 class="fw-bold mb-4" style="color: #3eb3a0;"><i class="bi bi-chat-square-text me-2"></i>Valoraciones de Profesionales</h3>
+            <div id="resenas-lista">
+              ${producto.resenas && producto.resenas.length > 0
+                ? producto.resenas.map(r => renderResena(r)).join('')
+                : '<div class="alert alert-light py-4 border text-center" style="border-radius:12px;">Aún no hay reseñas verificadas para este producto.</div>'}
+            </div>
+          </div>
+
+          <div class="col-lg-4 mt-4 mt-lg-0">
+            ${VETESIA.auth.isLoggedIn() ? `
+              <div class="card p-4 shadow-sm border-0 bg-light" style="border-radius:15px; border-top: 4px solid #7ed957;">
+                <h5 class="fw-bold mb-3" style="color:#4a4a4a;">Dejar una Valoración</h5>
+                <form id="form-resena">
+                  <div class="mb-3">
+                    <label class="form-label small text-muted mb-1">Valoración:</label>
+                    <select id="valoracion" class="form-select" style="border-radius:10px;">
+                      <option value="5">★★★★★ (5 Estrellas)</option>
+                      <option value="4">★★★★☆ (4 Estrellas)</option>
+                      <option value="3">★★★☆☆ (3 Estrellas)</option>
+                      <option value="2">★★☆☆☆ (2 Estrellas)</option>
+                      <option value="1">★☆☆☆☆ (1 Estrella)</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small text-muted mb-1">Comentario:</label>
+                    <textarea id="texto-resena" class="form-control" rows="3" placeholder="Escribe tu opinión sobre el producto..." style="border-radius:10px;" required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-1 w-100 py-2 fs-5 text-white" style="border-radius:30px; font-family:'Smooch Sans', sans-serif;">Enviar Reseña</button>
+                </form>
+              </div>
+            ` : `
+              <div class="card p-4 text-center border-0 shadow-sm bg-light" style="border-radius:15px;">
+                <p class="text-muted mb-0">Debes <a href="/pages/mi-cuenta.html" style="color:#3eb3a0; font-weight:bold;">iniciar sesión</a> para poder escribir una reseña.</p>
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+
+      const container = document.getElementById('producto-container');
+      container.innerHTML = html;
+
+      // Event listener del formulario de añadir al carrito
+      document.getElementById('form-anadir').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const cantidadInput = document.getElementById('cantidad');
+        const cantidad = parseInt(cantidadInput.value) || 1;
+
+        const cartLine = {
+          producto_id: producto.id,
+          nombre: producto.nombre,
+          imagen_url: producto.imagen_url,
+          precio_base: producto.precio_base,
+          cantidad: cantidad
+        };
+
+        if (personalizable) {
+          const serviceSelect = document.getElementById('tipo-servicio');
+          const option = serviceSelect.options[serviceSelect.selectedIndex];
+          cartLine.tipo_servicio_id = parseInt(serviceSelect.value);
+          cartLine.tipo_servicio_name = option.getAttribute('data-nombre');
+          cartLine.precio_extra_servicio = parseFloat(option.getAttribute('data-extra')) || 0;
+          cartLine.personalizacion = document.getElementById('personalizacion').value.trim() || '';
+        }
+
+        VETESIA.cart.agregar(cartLine);
+        VETESIA.ui.toast('<i class="bi bi-check2-circle me-1"></i>Producto añadido al carrito correctamente!');
+      });
+
+      // Event listener de enviar reseña
+      const reviewForm = document.getElementById('form-resena');
+      if (reviewForm) {
+        reviewForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const valoracion = parseInt(document.getElementById('valoracion').value);
+          const texto = document.getElementById('texto-resena').value.trim();
+
+          try {
+            await VETESIA.api.post(`/resenas/producto/${producto.id}`, { valoracion, texto });
+            VETESIA.ui.toast('Reseña guardada. Pendiente de verificación por el administrador.', 'info');
+            reviewForm.reset();
+          } catch (err) {
+            VETESIA.ui.toast(err.message, 'error');
+          }
+        });
+      }
+    }
+
+    function renderResena(r) {
+      return `
+        <div class="card mb-3 border-0 shadow-sm p-4 bg-white" style="border-radius:15px; border-left: 5px solid #7ed957;">
+          <div class="d-flex justify-content-between mb-2">
+            <div>
+              <span class="fw-bold" style="color: #3eb3a0; font-size:1.15rem;">${VETESIA.ui.escapeHtml(r.autor_nombre || 'Cliente')}</span>
+              <span class="text-muted small ms-3"><i class="bi bi-calendar-event me-1"></i>${VETESIA.ui.fecha(r.fecha)}</span>
+            </div>
+            ${VETESIA.ui.estrellas(r.valoracion)}
+          </div>
+          <p class="mb-0 text-muted" style="line-height:1.5;">${VETESIA.ui.escapeHtml(r.texto)}</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

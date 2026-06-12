@@ -1,0 +1,323 @@
+/* === VetÉsia · Hoja de estilos principal === */
+:root {
+  --verde-principal: #7ED957;
+  --verde-oscuro: #5BB836;
+  --azul-verdoso: #3EB3A0;
+  --azul-verdoso-oscuro: #2A8C7E;
+  --gris-claro: #F5F5F5;
+  --gris-medio: #DDDDDD;
+  --gris-texto: #555;
+  --negro-suave: #2A2A2A;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--negro-suave);
+  background: #fafafa;
+}
+
+/* === Navbar === */
+.navbar-vetesia {
+  background: linear-gradient(135deg, var(--azul-verdoso) 0%, var(--verde-principal) 100%);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.navbar-vetesia .navbar-brand,
+.navbar-vetesia .nav-link {
+  color: white !important;
+  font-weight: 500;
+}
+.navbar-vetesia .nav-link:hover {
+  color: rgba(255,255,255,0.85) !important;
+}
+.navbar-vetesia .navbar-brand {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+.badge-cart {
+  background: var(--verde-oscuro);
+  color: white;
+  border-radius: 50%;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  margin-left: -10px;
+}
+
+/* === Botones === */
+.btn-vetesia {
+  background: var(--azul-verdoso);
+  border-color: var(--azul-verdoso);
+  color: white;
+  font-weight: 500;
+}
+.btn-vetesia:hover, .btn-vetesia:focus {
+  background: var(--azul-verdoso-oscuro);
+  border-color: var(--azul-verdoso-oscuro);
+  color: white;
+}
+.btn-verde {
+  background: var(--verde-principal);
+  border-color: var(--verde-principal);
+  color: white;
+  font-weight: 500;
+}
+.btn-verde:hover, .btn-verde:focus {
+  background: var(--verde-oscuro);
+  border-color: var(--verde-oscuro);
+  color: white;
+}
+
+/* === Hero === */
+.hero {
+  background: linear-gradient(135deg, var(--azul-verdoso) 0%, var(--verde-principal) 100%);
+  color: white;
+  padding: 4rem 0;
+  margin-bottom: 2rem;
+}
+.hero h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+}
+.hero p {
+  font-size: 1.2rem;
+  opacity: 0.95;
+}
+
+/* === Tarjetas de producto === */
+.card-producto {
+  border: 1px solid var(--gris-medio);
+  border-radius: 8px;
+  transition: all 0.2s;
+  height: 100%;
+  background: white;
+}
+.card-producto:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+}
+.card-producto .card-img-top {
+  background: var(--gris-claro);
+  padding: 1.5rem;
+  height: 200px;
+  object-fit: contain;
+}
+.card-producto .precio {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--azul-verdoso-oscuro);
+}
+.card-producto .estrellas {
+  color: #FFB400;
+}
+.tipo-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.tipo-estandar {
+  background: #E8F5FF;
+  color: #1B6BBA;
+}
+.tipo-personalizable {
+  background: #FFF2DD;
+  color: #B86A00;
+}
+
+/* === Estados de pedido === */
+.estado-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.estado-pendiente_pago { background: #FFF2DD; color: #B86A00; }
+.estado-pagado { background: #E8F5FF; color: #1B6BBA; }
+.estado-preparando { background: #FFE8C8; color: #A85B00; }
+.estado-enviado { background: #DDF4E0; color: #1F6F2E; }
+.estado-entregado { background: var(--verde-principal); color: white; }
+.estado-cancelado { background: #FFD8D8; color: #A82020; }
+.estado-reembolsado { background: #E8E8E8; color: #555; }
+
+/* === Filtros y sidebar === */
+.sidebar-filtros {
+  background: white;
+  border: 1px solid var(--gris-medio);
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: sticky;
+  top: 80px;
+}
+.sidebar-filtros h5 {
+  color: var(--azul-verdoso-oscuro);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--verde-principal);
+}
+
+/* === Footer === */
+footer.footer-vetesia {
+  background: var(--negro-suave);
+  color: white;
+  padding: 2.5rem 0 1.5rem;
+  margin-top: 4rem;
+}
+footer.footer-vetesia a {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+}
+footer.footer-vetesia a:hover { color: var(--verde-principal); }
+footer.footer-vetesia .footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.15);
+  margin-top: 2rem;
+  padding-top: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* === Formularios === */
+.form-vetesia {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 2.5rem;
+}
+.form-vetesia h2 {
+  color: var(--azul-verdoso-oscuro);
+  margin-bottom: 1.5rem;
+}
+.form-vetesia label {
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
+.form-vetesia .form-control:focus {
+  border-color: var(--azul-verdoso);
+  box-shadow: 0 0 0 0.25rem rgba(62, 179, 160, 0.15);
+}
+
+/* === Carrito === */
+.carrito-linea {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gris-medio);
+}
+.carrito-linea img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  background: var(--gris-claro);
+  border-radius: 6px;
+  margin-right: 1rem;
+}
+.carrito-linea .info {
+  flex: 1;
+}
+.carrito-resumen {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 80px;
+}
+.carrito-resumen .total {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--azul-verdoso-oscuro);
+}
+
+/* === Tablas admin === */
+.admin-tabla {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.admin-tabla thead {
+  background: var(--azul-verdoso);
+  color: white;
+}
+
+/* === Categorías === */
+.categoria-chip {
+  display: inline-block;
+  background: white;
+  border: 1px solid var(--gris-medio);
+  border-radius: 24px;
+  padding: 0.5rem 1.2rem;
+  margin: 0.25rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--gris-texto);
+  text-decoration: none;
+  font-weight: 500;
+}
+.categoria-chip:hover,
+.categoria-chip.activa {
+  background: var(--azul-verdoso);
+  color: white;
+  border-color: var(--azul-verdoso);
+}
+
+/* === Reseñas === */
+.resena {
+  background: white;
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--verde-principal);
+}
+.resena .autor {
+  font-weight: 600;
+  color: var(--azul-verdoso-oscuro);
+}
+.resena .fecha {
+  color: var(--gris-texto);
+  font-size: 0.85rem;
+}
+.resena .estrellas {
+  color: #FFB400;
+  margin-bottom: 0.3rem;
+}
+
+/* === Alertas/Toasts === */
+.toast-vetesia {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 9999;
+  min-width: 280px;
+}
+
+/* === Spinner === */
+.spinner-vetesia {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 3px solid var(--gris-medio);
+  border-top-color: var(--azul-verdoso);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  .hero p { font-size: 1rem; }
+  .sidebar-filtros { position: static; margin-bottom: 1rem; }
+}
+
+/* === Stock indicator === */
+.stock-info {
+  font-size: 0.9rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+.stock-ok { color: #1F6F2E; background: #DDF4E0; }
+.stock-bajo { color: #B86A00; background: #FFF2DD; }
+.stock-agotado { color: #A82020; background: #FFD8D8; }

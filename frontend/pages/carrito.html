@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito · VetÉsia</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vetesia.css">
+  <link rel="stylesheet" href="/css/carrito.css">
+</head>
+<body>
+  <!-- HEADER / NAVBAR -->
+  <div id="navbar-holder"></div>
+
+  <!-- CART CONTAINER -->
+  <div class="container mt-5 mb-5" style="min-height: 60vh;">
+    <h2 class="cart-title mb-4">Tu Carrito B2B</h2>
+    <div id="carrito-contenido">
+      <div class="text-center py-5"><div class="spinner-vetesia"></div></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer-holder"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCarrito();
+      document.addEventListener('carrito:cambio', renderCarrito);
+    });
+
+    function renderCarrito() {
+      const items = VETESIA.cart.obtener();
+      const cont = document.getElementById('carrito-contenido');
+
+      if (items.length === 0) {
+        cont.innerHTML = `
+          <div class="text-center py-5 shadow-sm border-0 bg-white" style="border-radius: 15px; padding: 40px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-cart-x text-muted mb-3" viewBox="0 0 16 16">
+              <path d="M7.354 5.646a.5.5 0 1 0-.708.708L7.793 7.5 6.646 8.646a.5.5 0 1 0 .708.708L8.5 8.207l1.146 1.147a.5.5 0 0 0 .708-.708L9.207 7.5l1.147-1.146a.5.5 0 0 0-.708-.708L8.5 6.793z"/>
+              <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+            </svg>
+            <h3 class="mb-4" style="color: #4a4a4a;">Tu carrito está vacío</h3>
+            <a href="/pages/catalogo.html" class="btn btn-custom px-5 py-3 fs-5" style="border-radius: 30px;">Ir a la Tienda</a>
+          </div>
+        `;
+        return;
+      }
+
+      // Calcular totales
+      const subtotalAll = VETESIA.cart.calcularSubtotal();
+      const envio = subtotalAll > 0 ? 45.00 : 0.00;
+      const iva = subtotalAll * 0.21;
+      const total = subtotalAll + envio + iva;
+
+      cont.innerHTML = `
+        <div class="row">
+          <div class="col-lg-8">
+            <!-- Cart Items -->
+            <div class="card shadow-sm border-0 mb-4" style="border-radius: 15px;">
+              <div class="card-body">
+                ${items.map((item, idx) => {
+                  const unitPrice = item.precio_base + (item.precio_extra_servicio || 0);
+                  const totalPrice = unitPrice * item.cantidad;
+                  const imgUrl = VETESIA.ui.imagen(item.imagen_url);
+                  
+                  let personalizacionHtml = '';
+                  if (item.tipo_servicio_id) {
+                    personalizacionHtml = `
+                      <div class="mt-1 small bg-light p-2 rounded" style="border-left: 3px solid #3eb3a0;">
+                        <span class="d-block fw-bold text-success">${VETESIA.ui.escapeHtml(item.tipo_servicio_name)}</span>
+                        ${item.personalizacion ? `<span>Texto: "${VETESIA.ui.escapeHtml(item.personalizacion)}"</span>` : ''}
+                      </div>
+                    `;
+                  }
+
+                  return `
+                    <div class="d-flex align-items-center py-3 ${idx < items.length - 1 ? 'border-bottom' : ''}">
+                      <img src="${imgUrl}" alt="${VETESIA.ui.escapeHtml(item.nombre)}" class="cart-item-img me-3" style="width: 80px; height: 80px; object-fit: contain;">
+                      <div class="flex-grow-1">
+                        <h5 class="mb-1" style="font-size: 1.5rem; color: #3eb3a0; font-weight:700;">${VETESIA.ui.escapeHtml(item.nombre)}</h5>
+                        ${personalizacionHtml}
+                      </div>
+                      <div class="d-flex align-items-center me-4">
+                        <button onclick="VETESIA.cart.actualizarCantidad(${idx}, ${item.cantidad - 1})" class="quantity-btn">-</button>
+                        <span class="mx-3 fs-5" style="min-width: 20px; text-align: center;">${item.cantidad}</span>
+                        <button onclick="VETESIA.cart.actualizarCantidad(${idx}, ${item.cantidad + 1})" class="quantity-btn">+</button>
+                      </div>
+                      <div class="text-end me-3" style="width: 120px;">
+                        <span class="fs-4 fw-bold" style="color: #4a4a4a;">${VETESIA.ui.precio(totalPrice)}</span>
+                      </div>
+                      <button onclick="VETESIA.cart.eliminar(${idx})" class="btn btn-link text-danger p-0 text-decoration-none" title="Eliminar">
+                        <span class="fs-4">✖</span>
+                      </button>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <!-- Summary -->
+            <div class="checkout-summary bg-light p-4" style="border-radius:15px; border-top: 4px solid #7ed957;">
+              <h4 class="mb-4 fw-bold" style="color: #3eb3a0; font-family: 'Bebas Neue', sans-serif;">Resumen del Pedido</h4>
+              <div class="d-flex justify-content-between mb-3 fs-5" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.35rem;">
+                <span>Subtotal</span>
+                <span>${VETESIA.ui.precio(subtotalAll)}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-3 fs-5" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.35rem;">
+                <span>Envío Asegurado B2B</span>
+                <span>${VETESIA.ui.precio(envio)}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-3 fs-5 text-muted" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.35rem;">
+                <span>IVA (21%)</span>
+                <span>${VETESIA.ui.precio(iva)}</span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between mb-4 mt-3">
+                <span class="fs-3 fw-bold">Total con IVA</span>
+                <span class="fs-3 fw-bold" style="color: #7ed957;">${VETESIA.ui.precio(total)}</span>
+              </div>
+              <a href="/pages/checkout.html" class="btn btn-custom w-100 mb-3 text-center d-block py-2 fs-5" style="border-radius: 30px; text-decoration: none;">Proceder al Pago</a>
+              <a href="/pages/catalogo.html" class="btn btn-outline-secondary w-100 py-2" style="border-radius: 30px; font-size: 1.2rem; font-family: 'Smooch Sans', sans-serif;">Seguir Comprando</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

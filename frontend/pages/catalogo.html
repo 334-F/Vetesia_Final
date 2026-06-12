@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda · VetÉsia</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vetesia.css">
+</head>
+<body>
+  <!-- HEADER / NAVBAR -->
+  <div id="navbar-holder"></div>
+
+  <div class="container my-5" style="min-height: 70vh;">
+    <h1 class="mb-5 text-center" style="font-size: 3.5rem; color: #3eb3a0; font-family: 'Bebas Neue', cursive;">NUESTRO CATÁLOGO</h1>
+
+    <div class="row">
+      <!-- Sidebar filtros -->
+      <aside class="col-md-3 mb-4">
+        <div class="card p-4 shadow-sm border-0" style="border-radius: 15px; background: white; border-top: 4px solid #7ed957;">
+          <h5 class="fw-bold mb-3" style="color: #3eb3a0; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem;">Buscar</h5>
+          <div class="mb-4">
+            <input type="text" id="buscar" class="form-control" placeholder="Nombre del producto…" style="border-radius: 10px;">
+          </div>
+
+          <h5 class="fw-bold mb-3" style="color: #3eb3a0; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem;">Categorías</h5>
+          <div id="filtro-categorias" class="mb-4" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.35rem;">
+            <!-- Categorías dinámicas -->
+          </div>
+
+          <h5 class="fw-bold mb-3" style="color: #3eb3a0; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem;">Tipo de Producto</h5>
+          <div class="mb-4" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.35rem;">
+            <div class="form-check mb-1">
+              <input class="form-check-input" type="radio" name="tipo" id="tipo-todos" value="" checked>
+              <label class="form-check-label" for="tipo-todos">Todos</label>
+            </div>
+            <div class="form-check mb-1">
+              <input class="form-check-input" type="radio" name="tipo" id="tipo-estandar" value="estandar">
+              <label class="form-check-label" for="tipo-estandar">Clínico / Veterinario</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="tipo" id="tipo-personalizable" value="personalizable">
+              <label class="form-check-label" for="tipo-personalizable">Uniforme Personalizable</label>
+            </div>
+          </div>
+
+          <h5 class="fw-bold mb-3" style="color: #3eb3a0; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem;">Ordenar por</h5>
+          <div>
+            <select id="orden" class="form-select" style="border-radius: 10px;">
+              <option value="">Nombre</option>
+              <option value="precio_asc">Precio: menor a mayor</option>
+              <option value="precio_desc">Precio: mayor a menor</option>
+              <option value="novedades">Más recientes</option>
+            </select>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Resultados -->
+      <main class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <p class="text-muted small mb-0"><span id="num-resultados" class="fw-bold text-success">0</span> productos encontrados</p>
+        </div>
+        <div id="productos-grid" class="row justify-content-center">
+          <!-- Grid dinámico -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer-holder"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    let categoriaId = VETESIA.ui.queryParam('categoria') || '';
+    let busqueda = VETESIA.ui.queryParam('q') || '';
+    let tipo = '';
+    let orden = '';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Poner la búsqueda si venía por URL
+      if (busqueda) {
+        document.getElementById('buscar').value = busqueda;
+      }
+
+      await cargarCategorias();
+      await cargarProductos();
+
+      document.getElementById('buscar').addEventListener('input', e => {
+        busqueda = e.target.value;
+        clearTimeout(window._tmrBuscar);
+        window._tmrBuscar = setTimeout(cargarProductos, 300);
+      });
+
+      document.querySelectorAll('input[name="tipo"]').forEach(r => {
+        r.addEventListener('change', e => { tipo = e.target.value; cargarProductos(); });
+      });
+
+      document.getElementById('orden').addEventListener('change', e => {
+        orden = e.target.value;
+        cargarProductos();
+      });
+    });
+
+    async function cargarCategorias() {
+      try {
+        const cats = await VETESIA.api.get('/categorias');
+        const cont = document.getElementById('filtro-categorias');
+        cont.innerHTML = `
+          <div class="form-check mb-1">
+            <input class="form-check-input" type="radio" name="categoria" id="cat-todas" value="" ${!categoriaId ? 'checked' : ''}>
+            <label class="form-check-label" for="cat-todas">Todas</label>
+          </div>
+        ` + cats.map(c => `
+          <div class="form-check mb-1">
+            <input class="form-check-input" type="radio" name="categoria" id="cat-${c.id}" value="${c.id}" ${String(c.id) === String(categoriaId) ? 'checked' : ''}>
+            <label class="form-check-label" for="cat-${c.id}">${VETESIA.ui.escapeHtml(c.nombre)}</label>
+          </div>
+        `).join('');
+
+        cont.querySelectorAll('input[name="categoria"]').forEach(r => {
+          r.addEventListener('change', e => { categoriaId = e.target.value; cargarProductos(); });
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function cargarProductos() {
+      const grid = document.getElementById('productos-grid');
+      VETESIA.ui.cargando(grid);
+      try {
+        let url = '/productos?';
+        if (categoriaId) url += `categoria_id=${categoriaId}&`;
+        if (busqueda) url += `q=${encodeURIComponent(busqueda)}&`;
+        if (tipo) url += `tipo=${tipo}&`;
+        if (orden) url += `orden=${orden}&`;
+
+        const productos = await VETESIA.api.get(url);
+        document.getElementById('num-resultados').textContent = productos.length;
+
+        if (productos.length === 0) {
+          grid.innerHTML = '<div class="col-12"><div class="alert alert-info text-center py-4 fs-5" style="border-radius:10px;">No hay productos que coincidan con los filtros.</div></div>';
+          return;
+        }
+
+        grid.innerHTML = productos.map(p => renderProducto(p)).join('');
+      } catch (e) {
+        grid.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center">${e.message}</div></div>`;
+      }
+    }
+
+    function renderProducto(p) {
+      const precioFormateado = VETESIA.ui.precio(p.precio_base);
+      const imgUrl = VETESIA.ui.imagen(p.imagen_url);
+      const linkUrl = `/pages/producto.html?id=${p.id}`;
+
+      // Línea de compra
+      const productEscaped = {
+        producto_id: p.id,
+        nombre: p.nombre,
+        imagen_url: p.imagen_url,
+        precio_base: p.precio_base,
+        cantidad: 1
+      };
+      const addCartJson = JSON.stringify(productEscaped).replace(/"/g, '&quot;');
+
+      return `
+        <div class="col-md-4 col-sm-6 mb-4">
+          <div class="card product-card text-center position-relative h-100 d-flex flex-column justify-content-between">
+            <div>
+              <button class="btn btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-3 heart-btn" onclick="this.classList.toggle('active'); event.preventDefault();">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                </svg>
+              </button>
+              <img src="${imgUrl}" class="card-img-top product-img" alt="${VETESIA.ui.escapeHtml(p.nombre)}">
+              <div class="card-body pb-0">
+                <h5 class="product-title">${VETESIA.ui.escapeHtml(p.nombre)}</h5>
+                <p class="card-text text-muted mb-1" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.4rem;">${VETESIA.ui.escapeHtml(p.categoria_nombre || '')}</p>
+                <h4 class="mb-3 fw-bold" style="color: #4a4a4a;">${precioFormateado}</h4>
+              </div>
+            </div>
+            <div class="card-body pt-0 pb-4">
+              <div class="d-flex justify-content-center gap-2 px-2">
+                <a href="${linkUrl}" class="btn btn-outline-secondary w-50 m-0" style="border-radius: 10px; font-weight: 500; font-size: 1.1rem !important; padding: 6px 0; display: flex; align-items: center; justify-content: center;">Ver Más</a>
+                <button onclick="VETESIA.cart.agregar(${addCartJson}); VETESIA.ui.toast('Producto añadido al carrito');" class="btn btn-1 text-white w-50 m-0 d-flex align-items-center justify-content-center gap-1" style="font-size: 1.1rem; padding: 6px 0; height: 100%;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                  </svg>
+                  Compra
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

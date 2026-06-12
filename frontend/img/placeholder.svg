@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#f5f5f5"/>
+  <text x="100" y="90" text-anchor="middle" font-size="48" fill="#cccccc">🐾</text>
+  <text x="100" y="130" text-anchor="middle" font-size="14" fill="#999" font-family="sans-serif">VetÉsia</text>
+</svg>

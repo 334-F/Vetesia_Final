@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+*.egg-info/
+
+# Variables de entorno
+.env
+*.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos generados
+backend/migrations/versions/
+backend/uploads/
+backend/invoices/
+
+# Docker
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db

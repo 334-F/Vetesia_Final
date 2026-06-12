@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Cuenta · VetÉsia</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vetesia.css">
+</head>
+<body>
+  <!-- HEADER / NAVBAR -->
+  <div id="navbar-holder"></div>
+
+  <!-- MAIN CONTAINER -->
+  <div class="container my-5" style="min-height: 65vh;">
+    <h1 class="mb-4" style="color: #3eb3a0; font-family: 'Bebas Neue', cursive; font-size: 3rem;">Panel de Control B2B</h1>
+    
+    <div class="row">
+      <!-- Sidebar Menu -->
+      <aside class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 p-3" style="border-radius:15px; border-top: 4px solid #7ed957;">
+          <div class="list-group list-group-flush" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.4rem;">
+            <a href="/pages/mi-cuenta.html" class="list-group-item list-group-item-action border-0 py-2 active" style="border-radius: 8px; font-weight:bold; color: #3eb3a0; background-color: rgba(62,179,160,0.08);">
+              <i class="bi bi-person me-2"></i>Datos Personales
+            </a>
+            <a href="/pages/mis-pedidos.html" class="list-group-item list-group-item-action border-0 py-2" style="border-radius: 8px;">
+              <i class="bi bi-box me-2"></i>Mis Pedidos
+            </a>
+            <a href="/pages/mis-direcciones.html" class="list-group-item list-group-item-action border-0 py-2" style="border-radius: 8px;">
+              <i class="bi bi-geo-alt me-2"></i>Direcciones B2B
+            </a>
+            <hr class="my-2">
+            <a href="#" class="list-group-item list-group-item-action border-0 py-2 text-danger" onclick="window.VETESIA.auth.logout(); return false;" style="border-radius: 8px;">
+              <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Account Forms -->
+      <main class="col-md-9">
+        <!-- 1. Perfil form -->
+        <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius:15px; background: white;">
+          <h4 class="fw-bold mb-4" style="color: #3eb3a0;"><i class="bi bi-card-text me-2"></i>Datos de Facturación / Contacto</h4>
+          <form id="form-perfil">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label small text-muted mb-1">Nombre</label>
+                <input type="text" id="nombre" class="form-control form-control-custom" placeholder="Nombre" style="border-radius: 10px;">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label small text-muted mb-1">Apellidos</label>
+                <input type="text" id="apellidos" class="form-control form-control-custom" placeholder="Apellidos" style="border-radius: 10px;">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted mb-1">Correo Electrónico (No modificable)</label>
+              <input type="email" id="email" class="form-control form-control-custom" placeholder="Email" disabled style="border-radius: 10px;">
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label small text-muted mb-1">Teléfono de Contacto</label>
+                <input type="tel" id="telefono" class="form-control form-control-custom" placeholder="Teléfono" style="border-radius: 10px;">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label small text-muted mb-1">Dirección Social / Fiscal</label>
+                <input type="text" id="direccion" class="form-control form-control-custom" placeholder="Dirección" style="border-radius: 10px;">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-1 text-white py-2 px-4" style="border-radius:30px; font-family:'Smooch Sans', sans-serif; font-size:1.3rem;">Guardar Cambios</button>
+          </form>
+        </div>
+
+        <!-- 2. Cambiar contraseña form -->
+        <div class="card shadow-sm border-0 p-4" style="border-radius:15px; background: white;">
+          <h4 class="fw-bold mb-4" style="color: #4a4a4a;"><i class="bi bi-shield-lock me-2" style="color:#7ed957;"></i>Seguridad de la Cuenta</h4>
+          <form id="form-password">
+            <div class="mb-3">
+              <label class="form-label small text-muted mb-1">Contraseña Actual</label>
+              <input type="password" id="actual" class="form-control form-control-custom" placeholder="Introduzca contraseña actual" required style="border-radius: 10px;">
+            </div>
+            <div class="mb-4">
+              <label class="form-label small text-muted mb-1">Nueva Contraseña (mínimo 8 caracteres)</label>
+              <input type="password" id="nueva" class="form-control form-control-custom" placeholder="Introduzca nueva contraseña" minlength="8" required style="border-radius: 10px;">
+            </div>
+            <button type="submit" class="btn btn-custom py-2 px-4 fs-5" style="border-radius:30px;">Cambiar Contraseña</button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer-holder"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!VETESIA.auth.requireAuth()) return;
+      
+      try {
+        const user = await VETESIA.api.get('/usuarios/me');
+        document.getElementById('nombre').value = user.nombre || '';
+        document.getElementById('apellidos').value = user.apellidos || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('telefono').value = user.telefono || '';
+        document.getElementById('direccion').value = user.direccion || '';
+      } catch (e) {
+        VETESIA.ui.toast('Error cargando los datos de usuario: ' + e.message, 'error');
+      }
+
+      document.getElementById('form-perfil').addEventListener('submit', async e => {
+        e.preventDefault();
+        try {
+          const resp = await VETESIA.api.patch('/usuarios/me', {
+            nombre: document.getElementById('nombre').value.trim(),
+            apellidos: document.getElementById('apellidos').value.trim(),
+            telefono: document.getElementById('telefono').value.trim() || null,
+            direccion: document.getElementById('direccion').value.trim() || null,
+          });
+          localStorage.setItem('vetesia_user', JSON.stringify(resp.usuario));
+          VETESIA.ui.toast('Tus datos de contacto han sido actualizados con éxito', 'success');
+        } catch (err) {
+          VETESIA.ui.toast(err.message, 'error');
+        }
+      });
+
+      document.getElementById('form-password').addEventListener('submit', async e => {
+        e.preventDefault();
+        try {
+          await VETESIA.api.patch('/auth/password', {
+            password_actual: document.getElementById('actual').value,
+            password_nueva: document.getElementById('nueva').value,
+          });
+          VETESIA.ui.toast('Tu contraseña ha sido cambiada correctamente', 'success');
+          e.target.reset();
+        } catch (err) {
+          VETESIA.ui.toast(err.message, 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
