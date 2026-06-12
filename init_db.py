@@ -107,6 +107,18 @@ def init_db():
         )
     ''')
 
+    # 6b. Tabla de Favoritos (mis favoritos de los clientes)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS favoritos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            producto_id INTEGER NOT NULL,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE,
+            FOREIGN KEY (producto_id) REFERENCES productos (id) ON DELETE CASCADE,
+            UNIQUE(usuario_id, producto_id)
+        )
+    ''')
+
     # 7. Tabla de Promociones
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS promociones (

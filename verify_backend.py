@@ -66,6 +66,14 @@ class VetesiaBackendTestCase(unittest.TestCase):
         self.assertIn(b'Panel de Control de Hospital Vet Prueba', response.data)
         self.assertIn(b'Hospital Vet Prueba', response.data)
         
+        # 1b. Verificar la tienda y favoritos estando logueado (para evitar errores de tabla favoritos)
+        response_tienda = self.client.get('/tienda.html')
+        self.assertEqual(response_tienda.status_code, 200)
+        self.assertIn(b'Wato 20', response_tienda.data)
+        
+        response_fav = self.client.get('/favoritos.html')
+        self.assertEqual(response_fav.status_code, 200)
+        
         # 2. Probar añadir un producto al carrito
         # Primero obtenemos un producto ID de la base de datos
         conn = get_db_connection()
