@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/vetesia.css">
+    <link rel="stylesheet" href="/static/css/vetesia.css?v=1.2">
 
 </head>
 
@@ -153,7 +153,7 @@
             </div>
 
             <!-- Grid de Productos -->
-            <div class="row justify-content-start" id="products-grid">
+            <div class="row justify-content-center" id="products-grid">
                 {% for producto in productos %}
                 <div class="col-md-4 col-sm-6 mb-4 product-item" data-nombre="{{ producto.nombre|lower }}" data-categoria="{{ producto.categoria }}" data-precio="{{ producto.precio }}">
                     <div class="card product-card text-center position-relative h-100 d-flex flex-column justify-content-between">
