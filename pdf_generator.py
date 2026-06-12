@@ -267,3 +267,170 @@ def generar_reporte_clientes_pdf(clientes):
     doc.build(story)
     buffer.seek(0)
     return buffer
+
+def generar_reporte_financiero_pdf(ventas, compras, total_ventas, total_compras, balance_neto):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter,
+                            rightMargin=40, leftMargin=40,
+                            topMargin=40, bottomMargin=40)
+    story = []
+    styles = getSampleStyleSheet()
+    
+    style_title = ParagraphStyle(
+        name='FinTitle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=20,
+        leading=24,
+        textColor=colors.HexColor('#3eb3a0'),
+        spaceAfter=6
+    )
+    style_subtitle = ParagraphStyle(
+        name='FinSubtitle',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9,
+        leading=12,
+        textColor=colors.HexColor('#666666'),
+        spaceAfter=20
+    )
+    style_section = ParagraphStyle(
+        name='FinSection',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=14,
+        leading=18,
+        textColor=colors.HexColor('#333333'),
+        spaceBefore=15,
+        spaceAfter=10
+    )
+    style_th = ParagraphStyle(
+        name='FinTH',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=9,
+        leading=11,
+        textColor=colors.white
+    )
+    style_td = ParagraphStyle(
+        name='FinTD',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9,
+        leading=11,
+        textColor=colors.HexColor('#333333')
+    )
+    
+    # 1. Cabecera del Reporte
+    story.append(Paragraph("VETÉSIA - REPORTE FINANCIERO CONSOLIDADO", style_title))
+    from datetime import datetime
+    current_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    story.append(Paragraph(f"Generado el: {current_date} | Ventas, Gastos de Proveedores y Balance de Resultados", style_subtitle))
+    
+    # 2. Resumen General (KPIs)
+    story.append(Paragraph("<b>Balance General de Resultados</b>", style_section))
+    
+    # Tabla de resumen
+    resumen_data = [
+        [Paragraph("<b>Concepto</b>", style_th), Paragraph("<b>Total</b>", style_th)],
+        [Paragraph("Ingresos por Ventas (Pedidos B2B)", style_td), Paragraph(f"+ {total_ventas:,.2f} €".replace(",", "X").replace(".", ",").replace("X", "."), style_td)],
+        [Paragraph("Gastos de Proveedores (Compras)", style_td), Paragraph(f"- {total_compras:,.2f} €".replace(",", "X").replace(".", ",").replace("X", "."), style_td)]
+    ]
+    
+    # Balance color indicator
+    balance_color = '#28a745' if balance_neto >= 0 else '#dc3545'
+    balance_sign = '+' if balance_neto >= 0 else ''
+    style_balance_td = ParagraphStyle(
+        name='FinBalanceTD',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=10,
+        leading=12,
+        textColor=colors.HexColor(balance_color)
+    )
+    resumen_data.append([
+        Paragraph("<b>BALANCE NETO</b>", style_td),
+        Paragraph(f"<b>{balance_sign}{balance_neto:,.2f} €</b>".replace(",", "X").replace(".", ",").replace("X", "."), style_balance_td)
+    ])
+    
+    resumen_table = Table(resumen_data, colWidths=[350, 182])
+    resumen_table.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
+        ('BACKGROUND', (0,0), (1,0), colors.HexColor('#3eb3a0')),
+        ('LINEBELOW', (0,0), (-1,0), 1.5, colors.HexColor('#7ed957')),
+        ('BACKGROUND', (0,1), (-1,-2), colors.HexColor('#f9f9f9')),
+        ('BACKGROUND', (0,-1), (-1,-1), colors.HexColor('#eeeeee')),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#dddddd')),
+    ]))
+    story.append(resumen_table)
+    story.append(Spacer(1, 15))
+    
+    # 3. Sección Ventas
+    story.append(Paragraph("<b>Detalle de Ingresos (Ventas)</b>", style_section))
+    ventas_rows = [
+        [Paragraph("<b>Pedido ID</b>", style_th), Paragraph("<b>Fecha</b>", style_th), Paragraph("<b>Empresa / CIF</b>", style_th), Paragraph("<b>Estado</b>", style_th), Paragraph("<b>Monto</b>", style_th)]
+    ]
+    for v in ventas:
+        ventas_rows.append([
+            Paragraph(f"#{v['id']}", style_td),
+            Paragraph(v['fecha'][:10] if len(v['fecha']) >= 10 else v['fecha'], style_td),
+            Paragraph(f"{v['empresa']} (CIF: {v['cif']})", style_td),
+            Paragraph(v['estado'].upper(), style_td),
+            Paragraph(f"{v['total']:,.2f} €".replace(",", "X").replace(".", ",").replace("X", "."), style_td)
+        ])
+    
+    if len(ventas_rows) == 1:
+        ventas_rows.append([Paragraph("No hay ventas registradas.", style_td), "", "", "", ""])
+        
+    ventas_table = Table(ventas_rows, colWidths=[60, 80, 230, 80, 82])
+    ventas_table.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ('TOPPADDING', (0,0), (-1,-1), 6),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#3eb3a0')),
+        ('LINEBELOW', (0,0), (-1,0), 1.5, colors.HexColor('#7ed957')),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#dddddd')),
+    ]))
+    # Add alternating background
+    for i in range(1, len(ventas_rows)):
+        if i % 2 == 0:
+            ventas_table.setStyle(TableStyle([('BACKGROUND', (0, i), (-1, i), colors.HexColor('#f9f9f9'))]))
+    story.append(ventas_table)
+    story.append(Spacer(1, 15))
+    
+    # 4. Sección Compras
+    story.append(Paragraph("<b>Detalle de Gastos (Proveedores)</b>", style_section))
+    compras_rows = [
+        [Paragraph("<b>Gasto ID</b>", style_th), Paragraph("<b>Fecha</b>", style_th), Paragraph("<b>Proveedor</b>", style_th), Paragraph("<b>Concepto</b>", style_th), Paragraph("<b>Monto</b>", style_th)]
+    ]
+    for c in compras:
+        compras_rows.append([
+            Paragraph(f"#{c['id']}", style_td),
+            Paragraph(c['fecha'][:10] if len(c['fecha']) >= 10 else c['fecha'], style_td),
+            Paragraph(c['proveedor_nombre'] or 'Proveedor Desconocido', style_td),
+            Paragraph(c['concepto'], style_td),
+            Paragraph(f"{c['monto']:,.2f} €".replace(",", "X").replace(".", ",").replace("X", "."), style_td)
+        ])
+        
+    if len(compras_rows) == 1:
+        compras_rows.append([Paragraph("No hay compras de proveedores registradas.", style_td), "", "", "", ""])
+        
+    compras_table = Table(compras_rows, colWidths=[60, 80, 130, 180, 82])
+    compras_table.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ('TOPPADDING', (0,0), (-1,-1), 6),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#3eb3a0')),
+        ('LINEBELOW', (0,0), (-1,0), 1.5, colors.HexColor('#7ed957')),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#dddddd')),
+    ]))
+    for i in range(1, len(compras_rows)):
+        if i % 2 == 0:
+            compras_table.setStyle(TableStyle([('BACKGROUND', (0, i), (-1, i), colors.HexColor('#f9f9f9'))]))
+    story.append(compras_table)
+    
+    doc.build(story)
+    buffer.seek(0)
+    return buffer

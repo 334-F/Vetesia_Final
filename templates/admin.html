@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <title>VetÉsia - Administración B2B</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/vetesia.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .kpi-card {
+            border-radius: 15px;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,.1);
+        }
+        .nav-tabs .nav-link {
+            color: #495057;
+            font-weight: 600;
+        }
+        .nav-tabs .nav-link.active {
+            color: #3eb3a0 !important;
+            border-color: #dee2e6 #dee2e6 #fff !important;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container mt-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
+    <div class="container-1 d-flex justify-content-between align-items-center px-4">
+        <a href="/"><img src="/static/fotos/logo.webp" alt="Logo" class="logo-1"></a>
+        
+        <div class="d-flex align-items-center">
+            <ul class="nav mb-0 me-4">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/tienda.html" class="nav-link">Tienda</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/servicios.html" class="nav-link">Servicios que ofrecemos</a>
+                </li>
+            </ul>
+
+            <div class="header-icons d-flex align-items-center">
+                <a href="/carrito.html" class="icon-link ms-3 position-relative" title="Carrito de Compras">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-cart3 nav-icon cart-icon-svg" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                    </svg>
+                    {% if cart_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+                        {{ cart_count }}
+                    </span>
+                    {% endif %}
+                </a>
+                <a href="/cuenta.html" class="icon-link ms-3 d-flex align-items-center text-decoration-none" title="{% if logged_in %}Sesión iniciada como {{ user_name }}{% else %}Mi Cuenta{% endif %}" style="color: inherit;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-circle nav-icon nav-svg-icon" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                    </svg>
+                    {% if logged_in %}
+                    <span class="ms-1 d-none d-lg-inline" style="font-size: 0.95rem; color: #3eb3a0; font-weight: 500; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ user_name }}
+                    </span>
+                    <a href="/logout" class="ms-2 text-danger" title="Cerrar Sesión">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN ADMIN CONTENT -->
+    <div class="container mt-5 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3 flex-wrap gap-3">
+            <div>
+                <h1 style="color: #3eb3a0; font-weight: 700;" class="mb-0">Panel de Control de Administración</h1>
+                <p class="text-muted mb-0">Gestión B2B de Clientes, Pedidos, Inventario, Reseñas, Categorías, Promociones, Proveedores e Informes de VetÉsia</p>
+            </div>
+            {% if user_rol != 'trabajador' %}
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="/admin/reporte_clientes.pdf" class="btn btn-success d-flex align-items-center gap-2 px-4 py-2 fs-5" style="border-radius: 30px; background: linear-gradient(135deg, #28a745, #20c997); border: none;">
+                    <i class="bi bi-people-fill"></i> Reporte Clientes PDF
+                </a>
+                <a href="/admin/reporte_financiero.pdf" class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 fs-5" style="border-radius: 30px; background: linear-gradient(135deg, #0d6efd, #0b5ed7); border: none;">
+                    <i class="bi bi-file-earmark-bar-graph-fill"></i> Balance Financiero PDF
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="row mb-5">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm p-4 bg-white kpi-card" style="border-left: 5px solid #3eb3a0;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted d-block small mb-1 fw-bold text-uppercase">Clientes Activos</span>
+                            <h2 class="mb-0 fw-bold" style="color: #4a4a4a;">{{ stats.total_clientes }}</h2>
+                        </div>
+                        <div class="p-3 bg-light rounded-circle text-primary" style="color: #3eb3a0 !important;">
+                            <i class="bi bi-people-fill fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if user_rol != 'trabajador' %}
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm p-4 bg-white kpi-card" style="border-left: 5px solid #ff5b5b;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted d-block small mb-1 fw-bold text-uppercase">Gastos de Proveedores</span>
+                            <h2 class="mb-0 fw-bold" style="color: #4a4a4a;">- {{ stats.total_compras }} €</h2>
+                        </div>
+                        <div class="p-3 bg-light rounded-circle text-danger" style="color: #ff5b5b !important;">
+                            <i class="bi bi-bag-dash-fill fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm p-4 bg-white kpi-card" style="border-left: 5px solid {% if stats.balance_raw >= 0 %}#28a745{% else %}#dc3545{% endif %};">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted d-block small mb-1 fw-bold text-uppercase">Balance General</span>
+                            {% if stats.balance_raw >= 0 %}
+                            <h2 class="mb-0 fw-bold" style="color: #28a745;">+ {{ stats.balance_neto }} €</h2>
+                            {% else %}
+                            <h2 class="mb-0 fw-bold" style="color: #dc3545;">{{ stats.balance_neto }} €</h2>
+                            {% endif %}
+                        </div>
+                        <div class="p-3 bg-light rounded-circle text-success" style="color: {% if stats.balance_raw >= 0 %}#28a745{% else %}#dc3545{% endif %} !important;">
+                            <i class="bi bi-cash-stack fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TABS PANEL -->
+        <div class="card border-0 shadow-sm mb-5" style="border-radius: 20px;">
+            <div class="card-header bg-white pt-3 border-0">
+                <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" id="pedidos-tab" data-bs-toggle="tab" data-bs-target="#tab-pedidos" type="button">Pedidos</button></li>
+                    {% if user_rol != 'trabajador' %}
+                    <li class="nav-item"><button class="nav-link" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#tab-clientes" type="button">Clientes B2B</button></li>
+                    <li class="nav-item"><button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#tab-usuarios" type="button">Usuarios</button></li>
+                    {% endif %}
+                    <li class="nav-item"><button class="nav-link" id="productos-tab" data-bs-toggle="tab" data-bs-target="#tab-productos" type="button">Productos</button></li>
+                    <li class="nav-item"><button class="nav-link" id="categorias-tab" data-bs-toggle="tab" data-bs-target="#tab-categorias" type="button">Categorías</button></li>
+                    <li class="nav-item"><button class="nav-link" id="resenas-tab" data-bs-toggle="tab" data-bs-target="#tab-resenas" type="button">Reseñas pendientes</button></li>
+                    {% if user_rol != 'trabajador' %}
+                    <li class="nav-item"><button class="nav-link" id="proveedores-tab" data-bs-toggle="tab" data-bs-target="#tab-proveedores" type="button">Proveedores</button></li>
+                    <li class="nav-item"><button class="nav-link" id="compras-tab" data-bs-toggle="tab" data-bs-target="#tab-compras" type="button">Gastos y Compras</button></li>
+                    <li class="nav-item"><button class="nav-link" id="informes-tab" data-bs-toggle="tab" data-bs-target="#tab-informes" type="button">Informes</button></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="card-body p-4">
+                <div class="tab-content" id="adminTabsContent">
+                    
+                    <!-- ═══════════ PEDIDOS ═══════════ -->
+                    <div class="tab-pane fade show active" id="tab-pedidos" role="tabpanel">
+                        {% if not pedidos %}
+                        <p class="text-muted py-4 text-center">Aún no se han recibido pedidos en el sistema.</p>
+                        {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th><th>Fecha</th><th>Cliente / CIF</th><th>Productos</th><th>Total</th><th>Estado</th><th class="text-end">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in pedidos %}
+                                    <tr>
+                                        <td class="fw-bold">#{{ p.id }}</td>
+                                        <td>{{ p.fecha }}</td>
+                                        <td>
+                                            <div class="fw-bold">{{ p.empresa }}</div>
+                                            <small class="text-muted">CIF: {{ p.cif }}</small>
+                                        </td>
+                                        <td>
+                                            <ul class="list-unstyled mb-0" style="font-size: 0.85rem;">
+                                                {% for item in p.articulos %}
+                                                <li><i class="bi bi-box me-1"></i>{{ item.nombre }} (x{{ item.cantidad }})</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td class="fw-bold" style="color: #7ed957;">{{ "{:,.2f}".format(p.total).replace(",", "X").replace(".", ",").replace("X", ".") }} €</td>
+                                        <td>
+                                            <form action="/admin/pedido/{{ p.id }}/estado" method="POST" class="d-flex align-items-center gap-1">
+                                                <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()" style="border-radius: 10px; width: 130px; font-size: 0.85rem;">
+                                                    <option value="pendiente" {% if p.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                                    <option value="procesando" {% if p.estado == 'procesando' %}selected{% endif %}>Procesando</option>
+                                                    <option value="enviado" {% if p.estado == 'enviado' %}selected{% endif %}>Enviado</option>
+                                                    <option value="entregado" {% if p.estado == 'entregado' %}selected{% endif %}>Entregado</option>
+                                                    <option value="cancelado" {% if p.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                                                </select>
+                                                {% if p.estado == 'pendiente' %}
+                                                    <span class="badge bg-warning text-dark"><i class="bi bi-clock-history"></i></span>
+                                                {% elif p.estado == 'procesando' %}
+                                                    <span class="badge bg-primary"><i class="bi bi-gear-fill"></i></span>
+                                                {% elif p.estado == 'enviado' %}
+                                                    <span class="badge bg-info text-dark"><i class="bi bi-truck"></i></span>
+                                                {% elif p.estado == 'entregado' %}
+                                                    <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i></span>
+                                                {% elif p.estado == 'cancelado' %}
+                                                    <span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i></span>
+                                                {% endif %}
+                                            </form>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="/factura/{{ p.id }}.pdf" class="btn btn-outline-success btn-sm d-inline-flex align-items-center gap-1" style="border-radius: 15px;">
+                                                <i class="bi bi-file-earmark-pdf"></i> Factura PDF
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if user_rol != 'trabajador' %}
+                    <!-- ═══════════ CLIENTES B2B ═══════════ -->
+                    <div class="tab-pane fade" id="tab-clientes" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID/Tipo</th><th>Empresa</th><th>CIF / NIF</th><th>Contacto</th><th>Teléfono</th><th>Correo</th><th>Banco / IBAN</th><th>Ubicación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in clientes %}
+                                    <tr>
+                                        <td>
+                                            {% if c.id %}
+                                            <span class="badge bg-success py-1 px-2" style="font-weight: 500;">B2B #{{ c.id }}</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary py-1 px-2" style="font-weight: 500;">Invitado</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="fw-bold">{{ c.nombre_empresa or '-' }}</td>
+                                        <td><code class="text-dark">{{ c.cif or '-' }}</code></td>
+                                        <td>{{ c.contacto or '-' }}</td>
+                                        <td>{{ c.telefono or '-' }}</td>
+                                        <td><a href="mailto:{{ c.email }}" style="color: #3eb3a0;">{{ c.email or '-' }}</a></td>
+                                        <td>
+                                            {% if c.banco %}
+                                            <small class="d-block fw-bold">{{ c.banco }}</small>
+                                            <small class="text-muted">{{ c.iban }}</small>
+                                            {% else %}
+                                            <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if c.municipio %}
+                                            <small class="d-block">{{ c.direccion }}</small>
+                                            <small class="text-muted">{{ c.municipio }} ({{ c.zona }})</small>
+                                            {% else %}
+                                            <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if user_rol != 'trabajador' %}
+                    <!-- ═══════════ USUARIOS ═══════════ -->
+                    <div class="tab-pane fade" id="tab-usuarios" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <h4 class="mb-0" style="color: #3eb3a0; font-weight: bold;">Gestión de Usuarios y Permisos</h4>
+                            <button class="btn btn-primary btn-sm px-3 py-2" data-bs-toggle="modal" data-bs-target="#createUserModal" style="border-radius: 30px; background-color: #3eb3a0; border-color: #3eb3a0; font-weight: 500;">
+                                <i class="bi bi-plus-circle-fill me-1"></i> Crear Usuario
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th><th>Empresa</th><th>Email</th><th>Rol</th><th class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for u in usuarios %}
+                                    <tr>
+                                        <td>{{ u.id }}</td>
+                                        <td class="fw-bold">{{ u.nombre_empresa }}</td>
+                                        <td>{{ u.email }}</td>
+                                        <td>
+                                            <span class="badge {% if u.rol == 'admin' %}bg-success{% elif u.rol == 'trabajador' %}bg-warning text-dark{% else %}bg-info{% endif %}">{{ u.rol | upper }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex gap-1 align-items-center">
+                                                <form action="/admin/usuario/{{ u.id }}/rol" method="POST" class="m-0">
+                                                    <select name="rol" onchange="this.form.submit()" class="form-select form-select-sm" style="width: 120px; border-radius: 12px;">
+                                                        <option value="cliente" {% if u.rol == 'cliente' %}selected{% endif %}>Cliente</option>
+                                                        <option value="trabajador" {% if u.rol == 'trabajador' %}selected{% endif %}>Trabajador</option>
+                                                        <option value="admin" {% if u.rol == 'admin' %}selected{% endif %}>Admin</option>
+                                                    </select>
+                                                </form>
+                                                {% if u.email != 'admin@vetesia.com' and u.id != session.get('user_id') %}
+                                                <form action="/admin/usuario/{{ u.id }}/eliminar" method="POST" class="m-0" onsubmit="return confirm('¿Estás seguro de que deseas borrar este usuario permanentemente?')">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius: 12px;">
+                                                        Borrar
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- ═══════════ PRODUCTOS ═══════════ -->
+                    <div class="tab-pane fade" id="tab-productos" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <h4 class="mb-0" style="color: #3eb3a0; font-weight: bold;">Inventario de Productos B2B</h4>
+                            {% if user_rol != 'trabajador' %}
+                            <button class="btn btn-primary btn-sm px-3 py-2" data-bs-toggle="modal" data-bs-target="#createProductModal" style="border-radius: 30px; background-color: #3eb3a0; border-color: #3eb3a0;">
+                                <i class="bi bi-plus-circle-fill"></i> Agregar Nuevo Producto
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Imagen</th><th>Nombre / Slug</th><th>Categoría</th><th>Precio Base</th><th>Stock</th><th>Activo</th><th class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in productos %}
+                                    <tr>
+                                        <td>
+                                            <img src="{{ get_image_url(p.imagen_url) }}" alt="{{ p.nombre }}" style="width: 45px; height: 45px; object-fit: contain; border-radius: 5px; background: #f9f9f9; padding: 2px;">
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark">{{ p.nombre }}</div>
+                                            <code class="text-muted" style="font-size: 0.8rem;">{{ p.slug }}</code>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark fs-6">{{ p.categoria }}</span></td>
+                                        <td class="fw-bold">{{ "{:,.2f}".format(p.precio) }} €</td>
+                                        <td>
+                                            {% if p.stock < p.stock_minimo %}
+                                            <span class="badge bg-danger fs-6" title="Stock crítico (Mínimo: {{ p.stock_minimo }})">{{ p.stock }} (Crítico)</span>
+                                            {% elif p.stock < 15 %}
+                                            <span class="badge bg-warning text-dark fs-6" title="Stock bajo">{{ p.stock }} (Bajo)</span>
+                                            {% else %}
+                                            <span class="badge bg-success fs-6" title="Stock suficiente">{{ p.stock }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if p.activo == 1 %}
+                                            <span class="badge bg-success">Activo</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">Inactivo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-outline-primary btn-sm me-1" style="border-radius: 12px;" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editProductModal" 
+                                                    data-id="{{ p.id }}" 
+                                                    data-nombre="{{ p.nombre }}" 
+                                                    data-precio="{{ p.precio }}" 
+                                                    data-stock="{{ p.stock }}"
+                                                    data-minimo="{{ p.stock_minimo }}"
+                                                    data-activo="{{ p.activo }}"
+                                                    data-imagen="{{ p.imagen_url }}">
+                                                <i class="bi bi-pencil-fill"></i> Editar
+                                            </button>
+                                            {% if user_rol != 'trabajador' %}
+                                            <form action="/admin/producto/eliminar/{{ p.id }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de que quieres eliminar el producto \'{{ p.nombre }}\'?');">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" style="border-radius: 12px;">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ═══════════ CATEGORÍAS ═══════════ -->
+                    <div class="tab-pane fade" id="tab-categorias" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4>Categorías de Productos</h4>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createCategoryModal" style="border-radius: 20px; background-color: #3eb3a0; border-color: #3eb3a0;">
+                                <i class="bi bi-plus-circle-fill"></i> Nueva Categoría
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th><th>Nombre</th><th>Descripción</th><th class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cat in categorias %}
+                                    <tr>
+                                        <td>{{ cat.id }}</td>
+                                        <td class="fw-bold">{{ cat.nombre }}</td>
+                                        <td>{{ cat.descripcion or '-' }}</td>
+                                        <td class="text-end">
+                                            <form action="/admin/categoria/eliminar/{{ cat.id }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar la categoría {{ cat.nombre }}?');">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" style="border-radius: 12px;">
+                                                    <i class="bi bi-trash-fill"></i> Eliminar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ═══════════ RESEÑAS PENDIENTES ═══════════ -->
+                    <div class="tab-pane fade" id="tab-resenas" role="tabpanel">
+                        <h4 class="mb-3">Reseñas pendientes de verificar</h4>
+                        {% if not resenas_pendientes %}
+                        <div class="alert alert-success" style="border-radius: 12px;">No hay reseñas pendientes de verificación.</div>
+                        {% else %}
+                        <div class="row">
+                            {% for r in resenas_pendientes %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 shadow-sm p-3 bg-white" style="border-radius: 15px;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="fw-bold" style="color: #3eb3a0;">{{ r.usuario_nombre }}</div>
+                                        <div class="text-warning">
+                                            {% for i in range(r.valoracion) %}★{% endfor %}
+                                            {% for i in range(5 - r.valoracion) %}☆{% endfor %}
+                                        </div>
+                                    </div>
+                                    <h6 class="text-muted mb-2">Producto: {{ r.producto_nombre }}</h6>
+                                    <p class="small mb-3 text-dark">"{{ r.texto }}"</p>
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <form action="/admin/resena/{{ r.id }}/verificar" method="POST">
+                                            <button type="submit" class="btn btn-success btn-sm" style="border-radius: 10px;">✓ Verificar</button>
+                                        </form>
+                                        <form action="/admin/resena/eliminar/{{ r.id }}" method="POST" onsubmit="return confirm('¿Eliminar esta reseña?');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" style="border-radius: 10px;">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if user_rol != 'trabajador' %}
+                    <!-- ═══════════ PROVEEDORES ═══════════ -->
+                    <div class="tab-pane fade" id="tab-proveedores" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4>Proveedores B2B</h4>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createProveedorModal" style="border-radius: 20px; background-color: #3eb3a0; border-color: #3eb3a0;">
+                                <i class="bi bi-plus-circle-fill"></i> Agregar Proveedor
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th><th>Persona de Contacto</th><th>Email</th><th>Teléfono</th><th>Ubicación</th><th>Condiciones de Pago</th><th>Estado</th><th class="text-end">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for prov in proveedores %}
+                                    <tr>
+                                        <td class="fw-bold">{{ prov.nombre }}</td>
+                                        <td>{{ prov.contacto or '-' }}</td>
+                                        <td><a href="mailto:{{ prov.email }}" style="color: #3eb3a0;">{{ prov.email or '-' }}</a></td>
+                                        <td>{{ prov.telefono or '-' }}</td>
+                                        <td>{{ prov.direccion or '-' }}</td>
+                                        <td>{{ prov.condiciones or '-' }}</td>
+                                        <td>
+                                            {% if prov.activo == 1 %}
+                                            <span class="badge bg-success">Activo</span>
+                                            {% else %}
+                                            <span class="badge bg-danger">Inactivo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <form action="/admin/proveedor/eliminar/{{ prov.id }}" method="POST">
+                                                <button type="submit" class="btn btn-sm {% if prov.activo == 1 %}btn-outline-danger{% else %}btn-outline-success{% endif %}" style="border-radius: 12px;">
+                                                    {% if prov.activo == 1 %}Dar de baja{% else %}Activar{% endif %}
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if user_rol != 'trabajador' %}
+                    <!-- ═══════════ GASTOS Y COMPRAS ═══════════ -->
+                    <div class="tab-pane fade" id="tab-compras" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4>Gastos y Compras de Proveedores</h4>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createCompraModal" style="border-radius: 20px; background-color: #3eb3a0; border-color: #3eb3a0;">
+                                <i class="bi bi-plus-circle-fill"></i> Registrar Gasto
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Proveedor</th>
+                                        <th>Concepto / Maquinaria</th>
+                                        <th>Monto</th>
+                                        <th class="text-end">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in compras %}
+                                    <tr>
+                                        <td>#{{ c.id }}</td>
+                                        <td>{{ c.fecha[:10] if c.fecha else '-' }}</td>
+                                        <td class="fw-bold">{{ c.proveedor_nombre or 'Proveedor Desconocido' }}</td>
+                                        <td>{{ c.concepto }}</td>
+                                        <td class="fw-bold text-danger">- {{ "{:,.2f}".format(c.monto).replace(",", "X").replace(".", ",").replace("X", ".") }} €</td>
+                                        <td class="text-end">
+                                            <form action="/admin/compra/eliminar/{{ c.id }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este registro de gasto?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius: 12px;">
+                                                    <i class="bi bi-trash-fill"></i> Eliminar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">No hay gastos registrados.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if user_rol != 'trabajador' %}
+                    <!-- ═══════════ INFORMES Y ANALÍTICAS ═══════════ -->
+                    <div class="tab-pane fade" id="tab-informes" role="tabpanel">
+                        <div class="row">
+                            <!-- Stock bajo mínimos -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+                                    <div class="card-header bg-warning text-dark fw-bold border-0" style="border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                                        ⚠️ Stock bajo mínimos (Reposición)
+                                    </div>
+                                    <div class="card-body bg-white" style="border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;">
+                                        {% if not informe_stock %}
+                                        <p class="text-success mb-0 fw-bold">✓ Todo el inventario está por encima del stock mínimo.</p>
+                                        {% else %}
+                                        <table class="table table-sm mb-0">
+                                            <thead>
+                                                <tr><th>Producto</th><th>Stock</th><th>Mínimo</th><th>Diferencia</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for s in informe_stock %}
+                                                <tr>
+                                                    <td>{{ s.nombre }}</td>
+                                                    <td class="text-danger fw-bold">{{ s.stock }}</td>
+                                                    <td>{{ s.stock_minimo }}</td>
+                                                    <td><span class="badge bg-danger">+{{ s.diferencia }} unidades</span></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Ventas por mes -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+                                    <div class="card-header bg-success text-white fw-bold border-0" style="border-top-left-radius: 15px; border-top-right-radius: 15px; background-color: #3eb3a0 !important;">
+                                        📈 Ventas mensuales consolidadas
+                                    </div>
+                                    <div class="card-body bg-white" style="border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;">
+                                        {% if not informe_ventas %}
+                                        <p class="text-muted mb-0">No hay ventas registradas.</p>
+                                        {% else %}
+                                        <table class="table table-sm mb-0">
+                                            <thead>
+                                                <tr><th>Mes</th><th>Nº Pedidos</th><th>Ingresos Brutos</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for v in informe_ventas %}
+                                                <tr>
+                                                    <td>{{ v.mes }}</td>
+                                                    <td>{{ v.num_pedidos }}</td>
+                                                    <td class="fw-bold text-success">{{ "{:,.2f}".format(v.ingresos) }} €</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Productos más vendidos -->
+                            <div class="col-md-12 mb-4">
+                                <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+                                    <div class="card-header bg-dark text-white fw-bold border-0" style="border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                                        🏆 Productos estrella (Más vendidos)
+                                    </div>
+                                    <div class="card-body bg-white" style="border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;">
+                                        {% if not informe_top %}
+                                        <p class="text-muted mb-0">Aún no hay estadísticas de ventas registradas.</p>
+                                        {% else %}
+                                        <table class="table table-sm mb-0">
+                                            <thead>
+                                                <tr><th>#</th><th>Nombre del Producto</th><th>Unidades vendidas</th><th>Ingresos totales</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for top in informe_top %}
+                                                <tr>
+                                                    <td>{{ loop.index }}</td>
+                                                    <td class="fw-bold">{{ top.nombre }}</td>
+                                                    <td>{{ top.unidades }} unidades</td>
+                                                    <td class="text-success fw-bold">{{ "{:,.2f}".format(top.ingresos) }} €</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- MODAL CREAR PRODUCTO -->
+    <div class="modal fade" id="createProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 15px;">
+                <form action="/admin/producto/crear" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" style="color: #3eb3a0; font-weight: bold;">Agregar Nuevo Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Producto</label>
+                            <input type="text" name="nombre" class="form-control" required placeholder="Ej: Monitor de Anestesia X5">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Slug (Identificador único en URL)</label>
+                            <input type="text" name="slug" class="form-control" required placeholder="Ej: monitor-anestesia-x5">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Categoría</label>
+                            <select name="categoria" class="form-select" required>
+                                {% for cat in categorias %}
+                                <option value="{{ cat.nombre }}">{{ cat.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label">Precio (€)</label>
+                                <input type="number" name="precio" step="0.01" class="form-control" required placeholder="0.00">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Stock</label>
+                                <input type="number" name="stock" class="form-control" value="20" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Stock Mínimo</label>
+                                <input type="number" name="stock_minimo" class="form-control" value="5" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-control" rows="3" placeholder="Descripción técnica..." required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Imagen URL (nombre en static/fotos/ o URL externa)</label>
+                            <input type="text" name="imagen_url" class="form-control" placeholder="Ej: logo.webp o https://ejemplo.com/foto.jpg" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                        <button type="submit" class="btn btn-success text-white" style="border-radius: 10px; background-color: #3eb3a0; border-color: #3eb3a0;">Crear Producto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR PRODUCTO -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 15px;">
+                <form action="/admin/producto/editar" method="POST">
+                    <input type="hidden" name="id" id="edit-product-id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" style="color: #3eb3a0; font-weight: bold;">Editar Producto: <span id="edit-product-name-title"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Producto</label>
+                            <input type="text" id="edit-product-name" class="form-control" readonly disabled style="background-color: #e9ecef;">
+                        </div>
+                        {% if user_rol == 'trabajador' %}
+                        <!-- Trabajador solo puede editar Stock -->
+                        <div class="mb-3">
+                            <label class="form-label">Stock / Cantidad</label>
+                            <input type="number" name="stock" id="edit-product-stock" class="form-control" required>
+                        </div>
+                        {% else %}
+                        <!-- Admin puede editar todo -->
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label">Precio (€)</label>
+                                <input type="number" name="precio" id="edit-product-precio" step="0.01" class="form-control" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Stock</label>
+                                <input type="number" name="stock" id="edit-product-stock" class="form-control" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Stock Mínimo</label>
+                                <input type="number" name="stock_minimo" id="edit-product-min" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Imagen URL (nombre en static/fotos/ o URL externa)</label>
+                            <input type="text" name="imagen_url" id="edit-product-imagen" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Estado del Producto</label>
+                            <select name="activo" id="edit-product-activo" class="form-select">
+                                <option value="1">Activo</option>
+                                <option value="0">Inactivo</option>
+                            </select>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                        <button type="submit" class="btn btn-success text-white" style="border-radius: 10px; background-color: #3eb3a0; border-color: #3eb3a0;">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CREAR CATEGORÍA -->
+    <div class="modal fade" id="createCategoryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 15px;">
+                <form action="/admin/categoria/crear" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" style="color: #3eb3a0; font-weight: bold;">Agregar Nueva Categoría</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de Categoría</label>
+                            <input type="text" name="nombre" class="form-control" required placeholder="Ej: Laboratorio Clínico">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-control" rows="3" placeholder="Descripción de la categoría..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                        <button type="submit" class="btn btn-success text-white" style="border-radius: 10px; background-color: #3eb3a0; border-color: #3eb3a0;">Crear Categoría</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- MODAL CREAR PROVEEDOR -->
+    <div class="modal fade" id="createProveedorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 15px;">
+                <form action="/admin/proveedor/crear" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" style="color: #3eb3a0; font-weight: bold;">Agregar Proveedor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre Comercial del Proveedor</label>
+                            <input type="text" name="nombre" class="form-control" required placeholder="Ej: PharmaVet S.A.">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label">Persona de Contacto</label>
+                                <input type="text" name="contacto" class="form-control" placeholder="Ej: Carlos Ruiz">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" name="telefono" class="form-control" placeholder="900000000">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Correo electrónico</label>
+                            <input type="email" name="email" class="form-control" placeholder="proveedor@ejemplo.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección fiscal / almacén</label>
+                            <input type="text" name="direccion" class="form-control" placeholder="Calle de la Distribución 10, Madrid">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Condiciones de Pago</label>
+                            <input type="text" name="condiciones" class="form-control" placeholder="Ej: Pago a 30 días">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                        <button type="submit" class="btn btn-success text-white" style="border-radius: 10px; background-color: #3eb3a0; border-color: #3eb3a0;">Registrar Proveedor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR GASTO / COMPRA -->
+    <div class="modal fade" id="createCompraModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 15px;">
+                <form action="/admin/compra/crear" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" style="color: #3eb3a0; font-weight: bold;">Registrar Gasto de Proveedor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Proveedor</label>
+                            <select name="proveedor_id" class="form-select">
+                                <option value="">-- Proveedor Opcional / Desconocido --</option>
+                                {% for prov in proveedores %}
+                                <option value="{{ prov.id }}">{{ prov.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Concepto / Maquinaria <span class="text-danger">*</span></label>
+                            <input type="text" name="concepto" class="form-control" placeholder="Ej: Compra de Ecógrafo Mindray, Reparación, etc." required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Monto (€) <span class="text-danger">*</span></label>
+                            <input type="number" step="0.01" name="monto" class="form-control" placeholder="0.00" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha (Opcional, por defecto hoy)</label>
+                            <input type="date" name="fecha" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                        <button type="submit" class="btn btn-success text-white" style="border-radius: 10px; background-color: #3eb3a0; border-color: #3eb3a0;">Registrar Gasto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CREAR USUARIO -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                <form action="/admin/usuario/crear" method="POST">
+                    <div class="modal-header" style="border-bottom: 1px solid #eee;">
+                        <h5 class="modal-title" style="color: #3eb3a0; font-weight: bold;">Crear Nuevo Usuario / Empresa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <h6 class="fw-bold mb-3" style="color: #3eb3a0;"><i class="bi bi-shield-lock-fill me-2"></i>Información de Acceso</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <input type="text" name="empresa" class="form-control" required placeholder="Nombre de la Empresa *" style="border-radius: 10px;">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="email" name="email" class="form-control" required placeholder="Correo Electrónico (Email) *" style="border-radius: 10px;">
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <input type="password" name="password" class="form-control" required placeholder="Contraseña *" style="border-radius: 10px;">
+                            </div>
+                            <div class="col-md-6">
+                                <select name="rol" class="form-select" required style="border-radius: 10px;">
+                                    <option value="" disabled selected>Selecciona un Rol *</option>
+                                    <option value="cliente">Cliente B2B</option>
+                                    <option value="trabajador">Trabajador</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold mb-3" style="color: #3eb3a0;"><i class="bi bi-file-earmark-text-fill me-2"></i>Datos de Facturación B2B (Opcional)</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <input type="text" name="cif" class="form-control" placeholder="CIF / NIF (Ej: B12345678)" style="border-radius: 10px;">
+                            </div>
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <input type="text" name="contacto" class="form-control" placeholder="Persona de Contacto" style="border-radius: 10px;">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" name="telefono" class="form-control" placeholder="Teléfono de Contacto" style="border-radius: 10px;">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-8 mb-3 mb-md-0">
+                                <input type="text" name="direccion" class="form-control" placeholder="Dirección Social/Clínica" style="border-radius: 10px;">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" name="codigo_postal" class="form-control" placeholder="Código Postal" style="border-radius: 10px;">
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <input type="text" name="municipio" class="form-control" placeholder="Municipio / Ciudad" style="border-radius: 10px;">
+                            </div>
+                            <div class="col-md-6">
+                                <select name="zona" class="form-select" style="border-radius: 10px;">
+                                    <option value="" disabled selected>Zona de Envío</option>
+                                    <option value="PI">Península Ibérica</option>
+                                    <option value="IB">Islas Baleares</option>
+                                    <option value="IC">Islas Canarias</option>
+                                    <option value="CE">Ceuta / Melilla</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold mb-3" style="color: #3eb3a0;"><i class="bi bi-bank2 me-2"></i>Datos Bancarios (Domiciliación B2B)</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <input type="text" name="banco" class="form-control" placeholder="Nombre de la Entidad Bancaria" style="border-radius: 10px;">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" name="iban" class="form-control" placeholder="Código IBAN (ESXX XXXX...)" style="border-radius: 10px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid #eee;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                        <button type="submit" class="btn btn-success text-white" style="border-radius: 10px; background-color: #3eb3a0; border-color: #3eb3a0; font-weight: 500;">Crear Usuario</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="gradient-footer text-white text-center ">
+        <div class="container">
+            <img src="/static/fotos/logo.webp" alt="Logo" class="logo mb-2">
+            <p class="mt-3 mb-0" style="color: black;">&copy; 2025 VetÉsia - Panel de Administración Corporativa</p>
+        </div>
+    </footer>
+
+    <script>
+        // Lógica para poblar el modal de edición de producto
+        const editProductModal = document.getElementById('editProductModal');
+        if (editProductModal) {
+            editProductModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const nombre = button.getAttribute('data-nombre');
+                const precio = button.getAttribute('data-precio');
+                const stock = button.getAttribute('data-stock');
+                const minimo = button.getAttribute('data-minimo');
+                const activo = button.getAttribute('data-activo');
+                const imagen = button.getAttribute('data-imagen');
+
+                document.getElementById('edit-product-id').value = id;
+                document.getElementById('edit-product-name-title').textContent = nombre;
+                document.getElementById('edit-product-name').value = nombre;
+                document.getElementById('edit-product-stock').value = stock;
+
+                const elPrecio = document.getElementById('edit-product-precio');
+                if (elPrecio) elPrecio.value = precio;
+
+                const elMin = document.getElementById('edit-product-min');
+                if (elMin) elMin.value = minimo;
+
+                const elActivo = document.getElementById('edit-product-activo');
+                if (elActivo) elActivo.value = activo;
+
+                const elImagen = document.getElementById('edit-product-imagen');
+                if (elImagen) elImagen.value = imagen;
+            });
+        }
+    </script>
+</body>
+
+</html>
