@@ -4,38 +4,125 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Administración · VetÉsia</title>
+  <meta name="description" content="Panel de control de administración de VetÉsia. Gestión de clientes B2B, pedidos, productos, categorías, reseñas, promociones, proveedores e informes.">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/vetesia.css">
+  <style>
+    /* ── KPI Cards ── */
+    .kpi-card {
+      border-radius: 16px;
+      border: none;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,.13); }
+    .kpi-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+    }
+    .kpi-value { font-size: 2rem; font-weight: 700; color: #2d2d2d; }
+    .kpi-label { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #888; }
+
+    /* ── Tabs ── */
+    #adminTabs .nav-link { font-family: 'Smooch Sans', sans-serif; font-size: 1.3rem; font-weight: 700; }
+    #adminTabs .nav-link.active { color: #3eb3a0; }
+
+    /* ── Tablas ── */
+    .admin-tabla { overflow-x: auto; }
+
+    /* ── Badge rol ── */
+    .badge-admin { background: #3eb3a0; color: #fff; }
+    .badge-cliente { background: #6c757d; color: #fff; }
+    .badge-invitado { background: #aaa; color: #fff; }
+
+    /* ── Botón PDF ── */
+    .btn-pdf {
+      background: linear-gradient(135deg,#28a745,#20c997);
+      color:#fff; border:none; border-radius:30px;
+      padding: .45rem 1.3rem; font-weight:600;
+      display:inline-flex; align-items:center; gap:.4rem;
+      transition: opacity .2s;
+    }
+    .btn-pdf:hover { opacity:.88; color:#fff; }
+  </style>
 </head>
 <body>
   <!-- HEADER / NAVBAR -->
   <div id="navbar-holder"></div>
 
   <div class="container my-5 px-4" style="min-height: 70vh;">
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+
+    <!-- Cabecera -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3 flex-wrap gap-3">
       <div>
-        <h1 style="color: #3eb3a0; font-family: 'Bebas Neue', cursive; font-size: 3rem;" class="mb-0">Panel de Administración</h1>
+        <h1 style="color:#3eb3a0;font-family:'Bebas Neue',cursive;font-size:3rem;" class="mb-0">Panel de Administración</h1>
         <p class="text-muted mb-0">Gestión global de Clientes B2B, pedidos consolidados, inventario de productos y reseñas de VetÉsia</p>
+      </div>
+      <a id="btn-reporte-pdf" href="#" onclick="descargarReportePDF(event)"
+         class="btn-pdf" title="Descargar reporte de clientes en PDF">
+        <i class="bi bi-file-earmark-pdf-fill"></i> Reporte Clientes PDF
+      </a>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row mb-4" id="kpi-row">
+      <div class="col-md-4 mb-3">
+        <div class="card kpi-card p-4" style="border-left:5px solid #3eb3a0;">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="kpi-label">Clientes Activos</div>
+              <div class="kpi-value" id="kpi-clientes">—</div>
+            </div>
+            <div class="kpi-icon bg-light" style="color:#3eb3a0;"><i class="bi bi-people-fill"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card kpi-card p-4" style="border-left:5px solid #7ed957;">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="kpi-label">Pedidos Registrados</div>
+              <div class="kpi-value" id="kpi-pedidos">—</div>
+            </div>
+            <div class="kpi-icon bg-light" style="color:#7ed957;"><i class="bi bi-cart-check-fill"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card kpi-card p-4" style="border-left:5px solid #ffc107;">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="kpi-label">Ventas Consolidadas</div>
+              <div class="kpi-value" id="kpi-ventas">—</div>
+            </div>
+            <div class="kpi-icon bg-light" style="color:#ffc107;"><i class="bi bi-cash-stack"></i></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <ul class="nav nav-tabs mb-4 border-bottom" id="adminTabs" role="tablist" style="font-family: 'Smooch Sans', sans-serif; font-size: 1.4rem; font-weight: bold;">
-      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-pedidos" type="button">Pedidos</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-productos" type="button">Productos</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-categorias" type="button">Categorías</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-resenas" type="button">Reseñas pendientes</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-promociones" type="button">Promociones</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-proveedores" type="button">Proveedores</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-informes" type="button">Informes</button></li>
+    <!-- Pestañas -->
+    <ul class="nav nav-tabs mb-4 border-bottom flex-wrap" id="adminTabs" role="tablist">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-pedidos"    type="button">Pedidos</button></li>
+      <li class="nav-item"><button class="nav-link"        data-bs-toggle="tab" data-bs-target="#tab-clientes"   type="button">Clientes B2B</button></li>
+      <li class="nav-item"><button class="nav-link"        data-bs-toggle="tab" data-bs-target="#tab-usuarios"   type="button">Usuarios</button></li>
+      <li class="nav-item"><button class="nav-link"        data-bs-toggle="tab" data-bs-target="#tab-productos"  type="button">Productos</button></li>
+      <li class="nav-item"><button class="nav-link"        data-bs-toggle="tab" data-bs-target="#tab-categorias" type="button">Categorías</button></li>
+      <li class="nav-item"><button class="nav-link"        data-bs-toggle="tab" data-bs-target="#tab-resenas"    type="button">Reseñas pendientes</button></li>
+      <li class="nav-item"><button class="nav-link"        data-bs-toggle="tab" data-bs-target="#tab-promociones" type="button">Promociones</button></li>
+      <li class="nav-item"><button class="nav-link"        data-bs-toggle="tab" data-bs-target="#tab-proveedores" type="button">Proveedores</button></li>
+      <li class="nav-item"><button class="nav-link"        data-bs-toggle="tab" data-bs-target="#tab-informes"   type="button">Informes</button></li>
     </ul>
 
     <div class="tab-content">
 
-      <!-- PEDIDOS -->
+      <!-- ═══════════ PEDIDOS ═══════════ -->
       <div class="tab-pane fade show active" id="tab-pedidos">
         <div class="admin-tabla">
           <table class="table table-hover mb-0">
@@ -49,7 +136,55 @@
         </div>
       </div>
 
-      <!-- PRODUCTOS -->
+      <!-- ═══════════ CLIENTES B2B ═══════════ -->
+      <div class="tab-pane fade" id="tab-clientes">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4>Clientes B2B</h4>
+          <span class="text-muted small">Datos de empresa de los clientes registrados</span>
+        </div>
+        <div class="admin-tabla">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID / Tipo</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Tipo cliente</th>
+                <th>Registrado</th>
+                <th>Activo</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-clientes"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ USUARIOS ═══════════ -->
+      <div class="tab-pane fade" id="tab-usuarios">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4>Gestión de Usuarios</h4>
+          <span class="text-muted small">Cambia el rol de cualquier cuenta</span>
+        </div>
+        <div class="admin-tabla">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Registrado</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-usuarios"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ PRODUCTOS ═══════════ -->
       <div class="tab-pane fade" id="tab-productos">
         <div class="d-flex justify-content-between mb-3">
           <h4>Gestión de productos</h4>
@@ -67,7 +202,7 @@
         </div>
       </div>
 
-      <!-- CATEGORÍAS -->
+      <!-- ═══════════ CATEGORÍAS ═══════════ -->
       <div class="tab-pane fade" id="tab-categorias">
         <div class="d-flex justify-content-between mb-3">
           <h4>Categorías de productos</h4>
@@ -86,13 +221,13 @@
         </div>
       </div>
 
-      <!-- RESEÑAS -->
+      <!-- ═══════════ RESEÑAS ═══════════ -->
       <div class="tab-pane fade" id="tab-resenas">
         <h4 class="mb-3">Reseñas pendientes de verificar</h4>
         <div id="lista-resenas"></div>
       </div>
 
-      <!-- PROMOCIONES -->
+      <!-- ═══════════ PROMOCIONES ═══════════ -->
       <div class="tab-pane fade" id="tab-promociones">
         <div class="d-flex justify-content-between mb-3">
           <h4>Promociones</h4>
@@ -110,7 +245,7 @@
         </div>
       </div>
 
-      <!-- PROVEEDORES -->
+      <!-- ═══════════ PROVEEDORES ═══════════ -->
       <div class="tab-pane fade" id="tab-proveedores">
         <div class="d-flex justify-content-between mb-3">
           <h4>Proveedores</h4>
@@ -127,7 +262,7 @@
         </div>
       </div>
 
-      <!-- INFORMES -->
+      <!-- ═══════════ INFORMES ═══════════ -->
       <div class="tab-pane fade" id="tab-informes">
         <div class="row">
           <div class="col-md-6 mb-4">
@@ -151,10 +286,10 @@
         </div>
       </div>
 
-    </div>
-  </div>
+    </div><!-- /tab-content -->
+  </div><!-- /container -->
 
-  <!-- Modal cambiar estado de pedido -->
+  <!-- ═══════ MODAL: cambiar estado pedido ═══════ -->
   <div class="modal fade" id="modal-estado-pedido">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -180,7 +315,7 @@
     </div>
   </div>
 
-  <!-- Modal producto -->
+  <!-- ═══════ MODAL: producto ═══════ -->
   <div class="modal fade" id="modal-producto">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -211,7 +346,7 @@
     </div>
   </div>
 
-  <!-- Modal categoría -->
+  <!-- ═══════ MODAL: categoría ═══════ -->
   <div class="modal fade" id="modal-categoria">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -233,7 +368,7 @@
     </div>
   </div>
 
-  <!-- Modal promoción -->
+  <!-- ═══════ MODAL: promoción ═══════ -->
   <div class="modal fade" id="modal-promocion">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -261,6 +396,28 @@
     </div>
   </div>
 
+  <!-- ═══════ MODAL: cambiar rol usuario ═══════ -->
+  <div class="modal fade" id="modal-rol-usuario">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Cambiar rol</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input type="hidden" id="rol-usuario-id">
+          <p class="text-muted small mb-2">Usuario: <strong id="rol-usuario-nombre"></strong></p>
+          <label class="form-label">Nuevo rol:</label>
+          <select id="rol-usuario-select" class="form-select">
+            <option value="cliente">Cliente</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn btn-1 text-white" onclick="guardarRolUsuario()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="footer-holder"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -271,32 +428,37 @@
   <script src="/js/ui.js"></script>
   <script src="/js/layout.js"></script>
   <script>
-    let modalEstado, modalProducto, modalPromocion, modalCategoria;
+    let modalEstado, modalProducto, modalPromocion, modalCategoria, modalRol;
     let categoriasCache = [];
 
     document.addEventListener('DOMContentLoaded', async () => {
       if (!VETESIA.auth.requireAdmin()) return;
 
-      modalEstado = new bootstrap.Modal(document.getElementById('modal-estado-pedido'));
-      modalProducto = new bootstrap.Modal(document.getElementById('modal-producto'));
+      modalEstado    = new bootstrap.Modal(document.getElementById('modal-estado-pedido'));
+      modalProducto  = new bootstrap.Modal(document.getElementById('modal-producto'));
       modalPromocion = new bootstrap.Modal(document.getElementById('modal-promocion'));
       modalCategoria = new bootstrap.Modal(document.getElementById('modal-categoria'));
+      modalRol       = new bootstrap.Modal(document.getElementById('modal-rol-usuario'));
 
-      // Cargar categorías para los desplegables (producto, promoción, padre)
-      await refrescarCategoriasCache();
+      // Carga KPI cards y categorías en paralelo
+      await Promise.all([cargarStats(), refrescarCategoriasCache()]);
 
+      // Pestaña activa por defecto: Pedidos
       cargarPedidos();
 
       // Cargar cada pestaña al activarla
       document.querySelectorAll('#adminTabs button').forEach(btn => {
         btn.addEventListener('shown.bs.tab', e => {
           const target = e.target.dataset.bsTarget;
-          if (target === '#tab-productos') cargarProductos();
-          if (target === '#tab-categorias') cargarCategorias();
-          if (target === '#tab-resenas') cargarResenas();
+          if (target === '#tab-pedidos')     cargarPedidos();
+          if (target === '#tab-clientes')    cargarClientes();
+          if (target === '#tab-usuarios')    cargarUsuarios();
+          if (target === '#tab-productos')   cargarProductos();
+          if (target === '#tab-categorias')  cargarCategorias();
+          if (target === '#tab-resenas')     cargarResenas();
           if (target === '#tab-promociones') cargarPromociones();
           if (target === '#tab-proveedores') cargarProveedores();
-          if (target === '#tab-informes') cargarInformes();
+          if (target === '#tab-informes')    cargarInformes();
         });
       });
 
@@ -305,7 +467,26 @@
       document.getElementById('form-categoria').addEventListener('submit', guardarCategoria);
     });
 
-    // === PEDIDOS ===
+    // ═══════════════ KPI STATS ═══════════════
+    async function cargarStats() {
+      try {
+        const s = await VETESIA.api.get('/admin/stats');
+        document.getElementById('kpi-clientes').textContent = s.total_clientes;
+        document.getElementById('kpi-pedidos').textContent  = s.total_pedidos;
+        document.getElementById('kpi-ventas').textContent   = VETESIA.ui.precio(s.total_ventas);
+      } catch (e) {
+        console.warn('Stats no disponibles:', e.message);
+      }
+    }
+
+    // ═══════════════ PDF REPORTE ═══════════════
+    function descargarReportePDF(e) {
+      e.preventDefault();
+      // Abre la URL del informe PDF del backend
+      window.open(VETESIA.config.API_BASE + '/admin/reporte_clientes.pdf', '_blank');
+    }
+
+    // ═══════════════ PEDIDOS ═══════════════
     async function cargarPedidos() {
       try {
         const pedidos = await VETESIA.api.get('/admin/pedidos');
@@ -333,17 +514,98 @@
     }
 
     async function guardarEstadoPedido() {
-      const id = document.getElementById('estado-pedido-id').value;
+      const id     = document.getElementById('estado-pedido-id').value;
       const estado = document.getElementById('estado-pedido-select').value;
       try {
         await VETESIA.api.patch(`/admin/pedidos/${id}/estado`, { estado });
         VETESIA.ui.toast('Estado actualizado', 'success');
         modalEstado.hide();
         cargarPedidos();
+        cargarStats();
       } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
     }
 
-    // === PRODUCTOS ===
+    // ═══════════════ CLIENTES B2B ═══════════════
+    async function cargarClientes() {
+      try {
+        const usuarios = await VETESIA.api.get('/admin/usuarios');
+        // Filtrar solo clientes (no admins)
+        const clientes = usuarios.filter(u => u.rol === 'cliente' || u.rol === 'invitado');
+        const tbody = document.getElementById('tabla-clientes');
+        if (clientes.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No hay clientes registrados.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = clientes.map(c => `
+          <tr>
+            <td>
+              ${c.rol === 'invitado'
+                ? '<span class="badge badge-invitado">Invitado</span>'
+                : `<span class="badge badge-admin" style="background:#3eb3a0;">B2B #${c.id}</span>`}
+            </td>
+            <td><strong>${VETESIA.ui.escapeHtml(c.nombre)} ${VETESIA.ui.escapeHtml(c.apellidos || '')}</strong></td>
+            <td><a href="mailto:${VETESIA.ui.escapeHtml(c.email)}" style="color:#3eb3a0;">${VETESIA.ui.escapeHtml(c.email || '-')}</a></td>
+            <td>${VETESIA.ui.escapeHtml(c.telefono || '-')}</td>
+            <td><span class="badge bg-light text-dark border">${VETESIA.ui.escapeHtml(c.tipo_cliente || '-')}</span></td>
+            <td><small>${VETESIA.ui.fecha(c.fecha_registro)}</small></td>
+            <td>${c.activo ? '✅' : '❌'}</td>
+          </tr>
+        `).join('');
+      } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
+    }
+
+    // ═══════════════ USUARIOS (con gestión de rol) ═══════════════
+    async function cargarUsuarios() {
+      try {
+        const usuarios = await VETESIA.api.get('/admin/usuarios');
+        const tbody = document.getElementById('tabla-usuarios');
+        if (usuarios.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No hay usuarios.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = usuarios.map(u => {
+          const badgeClass = u.rol === 'admin' ? 'bg-success' : u.rol === 'invitado' ? 'bg-secondary' : 'bg-info';
+          return `
+          <tr>
+            <td>${u.id}</td>
+            <td>${VETESIA.ui.escapeHtml(u.nombre)} ${VETESIA.ui.escapeHtml(u.apellidos || '')}</td>
+            <td><small>${VETESIA.ui.escapeHtml(u.email)}</small></td>
+            <td><span class="badge ${badgeClass}">${u.rol}</span></td>
+            <td><small>${VETESIA.ui.fecha(u.fecha_registro)}</small></td>
+            <td>${u.activo ? '✅' : '❌'}</td>
+            <td>
+              ${u.rol !== 'invitado'
+                ? `<button class="btn btn-sm btn-outline-secondary"
+                     onclick="abrirCambioRol(${u.id}, '${VETESIA.ui.escapeHtml(u.nombre)}', '${u.rol}')">
+                     <i class="bi bi-shield-lock"></i> Rol
+                   </button>`
+                : '<span class="text-muted small">—</span>'}
+            </td>
+          </tr>`;
+        }).join('');
+      } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
+    }
+
+    function abrirCambioRol(id, nombre, rolActual) {
+      document.getElementById('rol-usuario-id').value    = id;
+      document.getElementById('rol-usuario-nombre').textContent = nombre;
+      document.getElementById('rol-usuario-select').value = rolActual;
+      modalRol.show();
+    }
+
+    async function guardarRolUsuario() {
+      const id  = document.getElementById('rol-usuario-id').value;
+      const rol = document.getElementById('rol-usuario-select').value;
+      try {
+        await VETESIA.api.patch(`/admin/usuarios/${id}/rol`, { rol });
+        VETESIA.ui.toast('Rol actualizado correctamente', 'success');
+        modalRol.hide();
+        cargarUsuarios();
+        cargarStats();
+      } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
+    }
+
+    // ═══════════════ PRODUCTOS ═══════════════
     async function cargarProductos() {
       try {
         const prods = await VETESIA.api.get('/productos?incluir_inactivos=true');
@@ -375,15 +637,15 @@
     }
 
     function editarProducto(p) {
-      document.getElementById('prod-id').value = p.id;
-      document.getElementById('prod-nombre').value = p.nombre || '';
-      document.getElementById('prod-categoria').value = p.categoria_id;
+      document.getElementById('prod-id').value          = p.id;
+      document.getElementById('prod-nombre').value      = p.nombre || '';
+      document.getElementById('prod-categoria').value   = p.categoria_id;
       document.getElementById('prod-descripcion').value = p.descripcion || '';
-      document.getElementById('prod-tipo').value = p.tipo;
-      document.getElementById('prod-precio').value = p.precio_base;
-      document.getElementById('prod-stock').value = p.stock;
-      document.getElementById('prod-imagen').value = p.imagen_url || '';
-      document.getElementById('prod-activo').checked = p.activo;
+      document.getElementById('prod-tipo').value        = p.tipo;
+      document.getElementById('prod-precio').value      = p.precio_base;
+      document.getElementById('prod-stock').value       = p.stock;
+      document.getElementById('prod-imagen').value      = p.imagen_url || '';
+      document.getElementById('prod-activo').checked    = p.activo;
       document.getElementById('modal-producto-titulo').textContent = 'Editar producto';
       modalProducto.show();
     }
@@ -392,22 +654,19 @@
       e.preventDefault();
       const id = document.getElementById('prod-id').value;
       const payload = {
-        nombre: document.getElementById('prod-nombre').value.trim(),
+        nombre:       document.getElementById('prod-nombre').value.trim(),
         categoria_id: parseInt(document.getElementById('prod-categoria').value, 10),
-        descripcion: document.getElementById('prod-descripcion').value.trim() || null,
-        tipo: document.getElementById('prod-tipo').value,
-        precio_base: parseFloat(document.getElementById('prod-precio').value),
-        stock: parseInt(document.getElementById('prod-stock').value, 10),
+        descripcion:  document.getElementById('prod-descripcion').value.trim() || null,
+        tipo:         document.getElementById('prod-tipo').value,
+        precio_base:  parseFloat(document.getElementById('prod-precio').value),
+        stock:        parseInt(document.getElementById('prod-stock').value, 10),
         stock_minimo: parseInt(document.getElementById('prod-stock-min').value, 10),
-        imagen_url: document.getElementById('prod-imagen').value.trim() || null,
-        activo: document.getElementById('prod-activo').checked,
+        imagen_url:   document.getElementById('prod-imagen').value.trim() || null,
+        activo:       document.getElementById('prod-activo').checked,
       };
       try {
-        if (id) {
-          await VETESIA.api.patch(`/productos/${id}`, payload);
-        } else {
-          await VETESIA.api.post('/productos', payload);
-        }
+        if (id) { await VETESIA.api.patch(`/productos/${id}`, payload); }
+        else     { await VETESIA.api.post('/productos', payload); }
         VETESIA.ui.toast('Producto guardado', 'success');
         modalProducto.hide();
         cargarProductos();
@@ -423,24 +682,19 @@
       } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
     }
 
-    // === CATEGORÍAS ===
-    // Recarga la lista de categorías y repuebla TODOS los desplegables que
-    // dependen de ella (alta de producto, promoción por categoría y categoría
-    // padre). Así, al crear una categoría nueva, aparece al instante en todos
-    // los formularios sin recargar la página.
+    // ═══════════════ CATEGORÍAS ═══════════════
     async function refrescarCategoriasCache() {
-      try {
-        categoriasCache = await VETESIA.api.get('/categorias');
-      } catch (e) { console.error(e); return; }
-      const selProd = document.getElementById('prod-categoria');
+      try { categoriasCache = await VETESIA.api.get('/categorias'); }
+      catch (e) { console.error(e); return; }
+      const selProd  = document.getElementById('prod-categoria');
       const selPromo = document.getElementById('promo-categoria');
       const selPadre = document.getElementById('cat-padre');
-      if (selProd) selProd.innerHTML = '';
+      if (selProd)  selProd.innerHTML  = '';
       if (selPromo) selPromo.innerHTML = '<option value="">— Todas —</option>';
       if (selPadre) selPadre.innerHTML = '<option value="">— Ninguna (categoría principal) —</option>';
       categoriasCache.forEach(c => {
         const opt = `<option value="${c.id}">${VETESIA.ui.escapeHtml(c.nombre)}</option>`;
-        if (selProd) selProd.innerHTML += opt;
+        if (selProd)  selProd.innerHTML  += opt;
         if (selPromo) selPromo.innerHTML += opt;
         if (selPadre) selPadre.innerHTML += opt;
       });
@@ -448,7 +702,7 @@
 
     async function cargarCategorias() {
       try {
-        const cats = await VETESIA.api.get('/categorias');
+        const cats  = await VETESIA.api.get('/categorias');
         const porId = Object.fromEntries(cats.map(c => [c.id, c.nombre]));
         document.getElementById('tabla-categorias').innerHTML = cats.map(c => `
           <tr>
@@ -473,31 +727,28 @@
     }
 
     function editarCategoria(c) {
-      document.getElementById('cat-id').value = c.id;
-      document.getElementById('cat-nombre').value = c.nombre || '';
+      document.getElementById('cat-id').value          = c.id;
+      document.getElementById('cat-nombre').value      = c.nombre || '';
       document.getElementById('cat-descripcion').value = c.descripcion || '';
-      document.getElementById('cat-padre').value = c.categoria_padre_id || '';
-      document.getElementById('cat-imagen').value = c.imagen_url || '';
+      document.getElementById('cat-padre').value       = c.categoria_padre_id || '';
+      document.getElementById('cat-imagen').value      = c.imagen_url || '';
       document.getElementById('modal-categoria-titulo').textContent = 'Editar categoría';
       modalCategoria.show();
     }
 
     async function guardarCategoria(e) {
       e.preventDefault();
-      const id = document.getElementById('cat-id').value;
+      const id    = document.getElementById('cat-id').value;
       const padre = document.getElementById('cat-padre').value;
       const payload = {
-        nombre: document.getElementById('cat-nombre').value.trim(),
-        descripcion: document.getElementById('cat-descripcion').value.trim() || null,
+        nombre:             document.getElementById('cat-nombre').value.trim(),
+        descripcion:        document.getElementById('cat-descripcion').value.trim() || null,
         categoria_padre_id: padre ? parseInt(padre, 10) : null,
-        imagen_url: document.getElementById('cat-imagen').value.trim() || null,
+        imagen_url:         document.getElementById('cat-imagen').value.trim() || null,
       };
       try {
-        if (id) {
-          await VETESIA.api.patch(`/categorias/${id}`, payload);
-        } else {
-          await VETESIA.api.post('/categorias', payload);
-        }
+        if (id) { await VETESIA.api.patch(`/categorias/${id}`, payload); }
+        else     { await VETESIA.api.post('/categorias', payload); }
         VETESIA.ui.toast('Categoría guardada', 'success');
         modalCategoria.hide();
         await refrescarCategoriasCache();
@@ -515,10 +766,10 @@
       } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
     }
 
-    // === RESEÑAS ===
+    // ═══════════════ RESEÑAS ═══════════════
     async function cargarResenas() {
       try {
-        const res = await VETESIA.api.get('/admin/resenas/pendientes');
+        const res  = await VETESIA.api.get('/admin/resenas/pendientes');
         const cont = document.getElementById('lista-resenas');
         if (res.length === 0) {
           cont.innerHTML = '<div class="alert alert-success">No hay reseñas pendientes.</div>';
@@ -556,7 +807,7 @@
       } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
     }
 
-    // === PROMOCIONES ===
+    // ═══════════════ PROMOCIONES ═══════════════
     async function cargarPromociones() {
       try {
         const promos = await VETESIA.api.get('/admin/promociones');
@@ -583,11 +834,11 @@
     async function guardarPromocion(e) {
       e.preventDefault();
       const payload = {
-        nombre: document.getElementById('promo-nombre').value.trim(),
-        tipo: document.getElementById('promo-tipo').value,
-        valor: parseFloat(document.getElementById('promo-valor').value),
+        nombre:      document.getElementById('promo-nombre').value.trim(),
+        tipo:        document.getElementById('promo-tipo').value,
+        valor:       parseFloat(document.getElementById('promo-valor').value),
         fecha_inicio: document.getElementById('promo-inicio').value + ':00',
-        fecha_fin: document.getElementById('promo-fin').value + ':00',
+        fecha_fin:   document.getElementById('promo-fin').value + ':00',
         categoria_id: parseInt(document.getElementById('promo-categoria').value, 10) || null,
       };
       try {
@@ -607,7 +858,7 @@
       } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
     }
 
-    // === PROVEEDORES ===
+    // ═══════════════ PROVEEDORES ═══════════════
     async function cargarProveedores() {
       try {
         const provs = await VETESIA.api.get('/proveedores');
@@ -623,7 +874,7 @@
       } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
     }
 
-    // === INFORMES ===
+    // ═══════════════ INFORMES ═══════════════
     async function cargarInformes() {
       try {
         const [stock, ventas, top] = await Promise.all([
@@ -655,5 +906,6 @@
       } catch (e) { VETESIA.ui.toast(e.message, 'error'); }
     }
   </script>
+
 </body>
 </html>

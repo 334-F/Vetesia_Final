@@ -240,6 +240,31 @@ def informe_productos_vendidos():
     } for r in rows])
 
 
+# --- Estadísticas / KPIs ---
+
+@admin_bp.route("/stats", methods=["GET"])
+@admin_required
+def stats_panel():
+    """Resumen de KPIs para las tarjetas del panel de administración."""
+    total_clientes = Usuario.query.filter(
+        Usuario.rol == "cliente",
+        Usuario.activo == True,
+    ).count()
+
+    total_pedidos = Pedido.query.count()
+
+    from sqlalchemy import func
+    total_ventas = db.session.query(func.coalesce(func.sum(Pedido.total), 0)).filter(
+        Pedido.estado.in_(["pagado", "preparando", "enviado", "entregado"])
+    ).scalar()
+
+    return jsonify({
+        "total_clientes": total_clientes,
+        "total_pedidos": total_pedidos,
+        "total_ventas": float(total_ventas),
+    })
+
+
 # --- Gestión de usuarios ---
 
 @admin_bp.route("/usuarios", methods=["GET"])
