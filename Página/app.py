@@ -307,13 +307,9 @@ def submit_order():
     telefono = request.form.get('telef')
     zona_val = request.form.get('country')
     municipio = request.form.get('ct')
-    direccion = request.form.get('cp') # El input de dirección tiene name="cp" en el original
-    codigo_postal = request.form.get('cp') # El input de CP tiene name="cp" también en el original, pero usemos lo que venga
+    direccion = request.form.get('direccion') 
+    codigo_postal = request.form.get('codigo_postal') 
     
-    # Para manejar los dos inputs con name="cp", podemos sacarlos por orden o por request.form.getlist('cp')
-    cp_list = request.form.getlist('cp')
-    direccion_val = cp_list[0] if len(cp_list) > 0 else ""
-    codigo_postal_val = cp_list[1] if len(cp_list) > 1 else ""
     
     titular_cuenta = request.form.get('titular_cuenta')
     iban = request.form.get('iban')
@@ -353,7 +349,7 @@ def submit_order():
             titular_cuenta, iban, banco, subtotal, iva, total
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
-        usuario_id, empresa, email, cif, contacto, telefono, zona_val, municipio, direccion_val, codigo_postal_val,
+        usuario_id, empresa, email, cif, contacto, telefono, zona_val, municipio, direccion, codigo_postal,
         titular_cuenta, iban, banco, subtotal_all, iva, total
     ))
     
@@ -436,6 +432,7 @@ def descargar_factura(pedido_id):
         WHERE dp.pedido_id = ?
     ''', (pedido_id,)).fetchall()
     conn.close()
+    print(dict(pedido))
     
     pdf_buffer = generar_factura_pdf(pedido, items)
     
