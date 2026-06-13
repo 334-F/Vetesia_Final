@@ -30,6 +30,12 @@ def create_app(config_name: str = "dev") -> Flask:
     else:
         origins_list = cors_config
 
+    # En desarrollo permitimos SIEMPRE cualquier origen. Así da igual el puerto
+    # que use Live Server (5500, 5501, ...) y se ignora cualquier .env local
+    # que pudiera restringir los orígenes. En producción se respeta CORS_ORIGINS.
+    if config_name == "dev":
+        origins_list = "*"
+
     cors.init_app(
         app,
         resources={r"/api/*": {"origins": origins_list}},

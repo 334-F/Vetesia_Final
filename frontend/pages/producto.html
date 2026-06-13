@@ -261,7 +261,7 @@
           const texto = document.getElementById('texto-resena').value.trim();
 
           try {
-            await VETESIA.api.post(`/resenas/producto/${producto.id}`, { valoracion, texto });
+            await VETESIA.api.post(`/resenas`, { producto_id: producto.id, valoracion, texto });
             VETESIA.ui.toast('Reseña guardada. Pendiente de verificación por el administrador.', 'info');
             reviewForm.reset();
           } catch (err) {
@@ -276,7 +276,7 @@
         <div class="card mb-3 border-0 shadow-sm p-4 bg-white" style="border-radius:15px; border-left: 5px solid #7ed957;">
           <div class="d-flex justify-content-between mb-2">
             <div>
-              <span class="fw-bold" style="color: #3eb3a0; font-size:1.15rem;">${VETESIA.ui.escapeHtml(r.autor_nombre || 'Cliente')}</span>
+              <span class="fw-bold" style="color: #3eb3a0; font-size:1.15rem;">${VETESIA.ui.escapeHtml(r.usuario_nombre || 'Cliente')}</span>
               <span class="text-muted small ms-3"><i class="bi bi-calendar-event me-1"></i>${VETESIA.ui.fecha(r.fecha)}</span>
             </div>
             ${VETESIA.ui.estrellas(r.valoracion)}

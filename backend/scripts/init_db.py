@@ -15,7 +15,7 @@ from app.extensions import db
 from app.models import (
     TipoCliente, MetodoPago, ZonaEnvio, TipoServicio, Categoria,
     Usuario, DireccionEnvio, Producto, PrecioEscalado, Promocion,
-    Proveedor, ProductoProveedor, Resena
+    Proveedor, ProductoProveedor, Resena, Pedido, LineaPedido
 )
 
 app = create_app("dev")
@@ -82,16 +82,15 @@ with app.app_context():
     db.session.add_all([admin, maria, carlos])
     db.session.flush()
 
-    db.session.add_all([
-        DireccionEnvio(usuario_id=maria.id, alias="Casa", destinatario="Maria Garcia",
-                       calle="Calle Mayor", numero="1", piso="3B",
-                       codigo_postal="28001", municipio="Madrid", provincia="Madrid",
-                       telefono_contacto="600000002", predeterminada=True),
-        DireccionEnvio(usuario_id=carlos.id, alias="Clinica", destinatario="Clinica Vet",
-                       calle="Av. Veterinaria", numero="22",
-                       codigo_postal="46001", municipio="Valencia", provincia="Valencia",
-                       telefono_contacto="600000003", predeterminada=True),
-    ])
+    dir_maria = DireccionEnvio(usuario_id=maria.id, alias="Casa", destinatario="Maria Garcia",
+                   calle="Calle Mayor", numero="1", piso="3B",
+                   codigo_postal="28001", municipio="Madrid", provincia="Madrid",
+                   telefono_contacto="600000002", predeterminada=True)
+    dir_carlos = DireccionEnvio(usuario_id=carlos.id, alias="Clinica", destinatario="Clinica Vet",
+                   calle="Av. Veterinaria", numero="22",
+                   codigo_postal="46001", municipio="Valencia", provincia="Valencia",
+                   telefono_contacto="600000003", predeterminada=True)
+    db.session.add_all([dir_maria, dir_carlos])
 
     productos = [
         Producto(categoria_id=1, nombre="Royal Canin Mini Adult 8kg",
@@ -197,6 +196,37 @@ with app.app_context():
         db.session.add(ProductoProveedor(proveedor_id=prov1.id, producto_id=productos[i].id,
                                           precio_compra=float(productos[i].precio_base) * 0.6,
                                           plazo_entrega_dias=7, es_principal=True))
+
+    # --- Pedidos de ejemplo (entregados) para habilitar las reseñas ---
+    # La regla de negocio exige haber comprado el producto antes de reseñarlo.
+    # Sembramos un pedido entregado para Maria y otro para Carlos.
+    pedido_maria = Pedido(usuario_id=maria.id, direccion_envio_id=dir_maria.id,
+                          metodo_pago_id=1, zona_envio_id=1, estado="entregado",
+                          coste_envio=4.95, descuento=0)
+    pedido_maria.lineas = [
+        LineaPedido(producto_id=productos[1].id, cantidad=1,
+                    precio_unitario=float(productos[1].precio_base),
+                    subtotal=float(productos[1].precio_base)),
+        LineaPedido(producto_id=productos[2].id, cantidad=2,
+                    precio_unitario=float(productos[2].precio_base),
+                    subtotal=float(productos[2].precio_base) * 2),
+    ]
+    pedido_maria.calcular_total()
+
+    pedido_carlos = Pedido(usuario_id=carlos.id, direccion_envio_id=dir_carlos.id,
+                           metodo_pago_id=1, zona_envio_id=1, estado="entregado",
+                           coste_envio=4.95, descuento=0)
+    pedido_carlos.lineas = [
+        LineaPedido(producto_id=productos[1].id, cantidad=1,
+                    precio_unitario=float(productos[1].precio_base),
+                    subtotal=float(productos[1].precio_base)),
+        LineaPedido(producto_id=productos[3].id, cantidad=1,
+                    precio_unitario=float(productos[3].precio_base),
+                    subtotal=float(productos[3].precio_base)),
+    ]
+    pedido_carlos.calcular_total()
+
+    db.session.add_all([pedido_maria, pedido_carlos])
 
     db.session.add(Resena(usuario_id=maria.id, producto_id=productos[0].id,
                           valoracion=5, texto="A mi perro le encanta esta comida.",
