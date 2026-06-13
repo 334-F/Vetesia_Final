@@ -20,5 +20,6 @@ RUN mkdir -p /var/vetesia/uploads /var/vetesia/invoices
 
 EXPOSE 5000
 
-# Comando de producción: gunicorn con 4 workers
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "60", "run:app"]
+# Comando de produccion: primero crea y rellena la BBDD (usuarios, productos,
+# proveedores, pedidos de ejemplo) y luego arranca gunicorn.
+CMD ["sh", "-c", "python scripts/init_db.py && gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 60 run:app"]
